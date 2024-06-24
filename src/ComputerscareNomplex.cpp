@@ -21,6 +21,10 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         MODULUS_INPUT_TRIM,
         ARGUMENT_INPUT_OFFSET,
         ARGUMENT_INPUT_TRIM,
+        RECT_IN_RECT_OUT_MODE,
+        RECT_IN_POLAR_OUT_MODE,
+        POLAR_IN_RECT_OUT_MODE,
+        POLAR_IN_POLAR_OUT_MODE,
         NUM_PARAMS
     };
     enum InputIds
@@ -90,6 +94,8 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         configParam(MODULUS_INPUT_TRIM,-2.f,2.f,1.f,"Modulus Input Attenuversion");
         configParam(ARGUMENT_INPUT_OFFSET,-10.f,10.f,0.f,"Argument Input Offset"," radians");
         configParam(ARGUMENT_INPUT_TRIM,-2.f,2.f,1.f,"Argument Input Attenuversion");
+
+        configParam(RECT_IN_RECT_OUT_MODE,0.f,1.f,0.f,"Rect Input Output Mode");
 
         configOutput(RECT_IN_RECT_OUT, "Rectangular Input, Rectangular #1-8");
         configOutput(RECT_IN_RECT_OUT + 1, "Rectangular Input, Rectangular #9-16");
@@ -336,7 +342,7 @@ struct ComputerscareNomplexPumbersWidget : ModuleWidget
         addParam(createParam<SmoothKnob>(Vec(rightInputX, rectInSectionY).plus(offsetRelPos), module, ComputerscareNomplexPumbers::IMAGINARY_INPUT_OFFSET));
         addParam(createParam<SmallKnob>(Vec(rightInputX, rectInSectionY).plus(trimRelPos), module, ComputerscareNomplexPumbers::IMAGINARY_INPUT_TRIM));
 
-        cpx::CompolyOutWidget* outRect1 = new cpx::CompolyOutWidget(Vec(output1X, rectInSectionY+30),module,ComputerscareNomplexPumbers::RECT_IN_RECT_OUT,0);
+        cpx::CompolyOutWidget* outRect1 = new cpx::CompolyOutWidget(Vec(output1X, rectInSectionY+30),module,ComputerscareNomplexPumbers::RECT_IN_RECT_OUT,ComputerscareNomplexPumbers::RECT_IN_RECT_OUT_MODE);
         addChild(outRect1);
        // addOutput(createOutput<cpx::ComplexOutport>(Vec(output1X, rectInSectionY+30), module, ComputerscareNomplexPumbers::RECT_IN_RECT_OUT ));
         addOutput(createOutput<OutPort>(Vec(output2X, rectInSectionY+30), module, ComputerscareNomplexPumbers::RECT_IN_RECT_OUT+1 ));
