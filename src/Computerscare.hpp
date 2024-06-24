@@ -580,3 +580,6 @@ struct SmallLetterDisplay : Widget {
 #include "drawFunctions.hpp"
 #include "ComputerscarePolyModule.hpp"
 #include "MenuParams.hpp"
+#include "complex/ComputerscareComplexBase.cpp"
+#include "complex/ComplexWidgets.hpp"
+

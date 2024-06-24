@@ -6,7 +6,7 @@ std::vector<std::string> wrapModeDescriptions;
 
 
 
-struct ComputerscareNomplexPumbers : ComputerscareMenuParamModule
+struct ComputerscareNomplexPumbers : ComputerscareComplexBase
 {
     enum ParamIds
     {   
@@ -324,7 +324,7 @@ struct ComputerscareNomplexPumbersWidget : ModuleWidget
         Vec offsetRelPos = Vec(0,-25.f);
         Vec trimRelPos = Vec(-20,0.f);
 
-        Vec channelsKnobRelPos = Vec(-25.f,0);
+        Vec channelsKnobRelPos = Vec(-50.f,25.f);
 
 
         addInput(createInput<InPort>(Vec(leftInputX, rectInSectionY), module, ComputerscareNomplexPumbers::REAL_IN));
@@ -336,7 +336,9 @@ struct ComputerscareNomplexPumbersWidget : ModuleWidget
         addParam(createParam<SmoothKnob>(Vec(rightInputX, rectInSectionY).plus(offsetRelPos), module, ComputerscareNomplexPumbers::IMAGINARY_INPUT_OFFSET));
         addParam(createParam<SmallKnob>(Vec(rightInputX, rectInSectionY).plus(trimRelPos), module, ComputerscareNomplexPumbers::IMAGINARY_INPUT_TRIM));
 
-        addOutput(createOutput<OutPort>(Vec(output1X, rectInSectionY+30), module, ComputerscareNomplexPumbers::RECT_IN_RECT_OUT ));
+        cpx::CompolyOutWidget* outRect1 = new cpx::CompolyOutWidget(Vec(output1X, rectInSectionY+30),module,ComputerscareNomplexPumbers::RECT_IN_RECT_OUT,0);
+        addChild(outRect1);
+       // addOutput(createOutput<cpx::ComplexOutport>(Vec(output1X, rectInSectionY+30), module, ComputerscareNomplexPumbers::RECT_IN_RECT_OUT ));
         addOutput(createOutput<OutPort>(Vec(output2X, rectInSectionY+30), module, ComputerscareNomplexPumbers::RECT_IN_RECT_OUT+1 ));
 
         addOutput(createOutput<OutPort>(Vec(output1X, rectInSectionY+70), module, ComputerscareNomplexPumbers::RECT_IN_POLAR_OUT ));
