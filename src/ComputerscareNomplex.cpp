@@ -1,4 +1,5 @@
 #include "Computerscare.hpp"
+#include "complex/ComplexWidgets.hpp"
 
 #include <array>
 
@@ -25,6 +26,8 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         RECT_IN_POLAR_OUT_MODE,
         POLAR_IN_RECT_OUT_MODE,
         POLAR_IN_POLAR_OUT_MODE,
+        COMPLEX_CONSTANT_A,
+        COMPLEX_CONSTANT_B,
         NUM_PARAMS
     };
     enum InputIds
@@ -221,6 +224,10 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         outputs[POLAR_IN_POLAR_OUT+0].setChannels(numPolarInOutChannels1);
         outputs[POLAR_IN_POLAR_OUT+1].setChannels(numPolarInOutChannels2);
 
+
+        float xyParamX = params[COMPLEX_CONSTANT_A].getValue();
+        float xyParamY = params[COMPLEX_CONSTANT_A+1].getValue();
+
         float realOffsetKnob = params[REAL_INPUT_OFFSET].getValue();
         float realTrimKnob = params[REAL_INPUT_TRIM].getValue();
 
@@ -241,8 +248,8 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
             int realInputCh=channelIndices[0];
             int imInputCh=channelIndices[1];
 
-            float x = inputs[REAL_IN].getVoltage(realInputCh)*realTrimKnob + realOffsetKnob;
-            float y = inputs[IMAGINARY_IN].getVoltage(imInputCh)*imaginaryTrimKnob + imaginaryOffsetKnob;
+            float x = inputs[REAL_IN].getVoltage(realInputCh)*realTrimKnob + realOffsetKnob + xyParamX;
+            float y = inputs[IMAGINARY_IN].getVoltage(imInputCh)*imaginaryTrimKnob + imaginaryOffsetKnob + xyParamY;
 
             outputs[RECT_IN_RECT_OUT + outputBlock].setVoltage(x,rectInputCh*2 % 16);
             outputs[RECT_IN_RECT_OUT + outputBlock].setVoltage(y,(rectInputCh*2+1) % 16);
@@ -331,6 +338,11 @@ struct ComputerscareNomplexPumbersWidget : ModuleWidget
         Vec trimRelPos = Vec(-20,0.f);
 
         Vec channelsKnobRelPos = Vec(-50.f,25.f);
+
+        cpx::ComplexXY* xy = new cpx::ComplexXY(module,ComputerscareNomplexPumbers::COMPLEX_CONSTANT_A);
+        xy->box.size=Vec(10,20);
+        xy->box.pos=Vec(70,30);
+        addChild(xy);
 
 
         addInput(createInput<InPort>(Vec(leftInputX, rectInSectionY), module, ComputerscareNomplexPumbers::REAL_IN));

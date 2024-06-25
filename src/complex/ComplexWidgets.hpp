@@ -5,6 +5,134 @@ using namespace rack;
 
 namespace cpx {
 
+	struct ComplexXY : TransparentWidget {
+	ComputerscareComplexBase* module;
+
+	Vec clickedMousePosition;
+	Vec thisPos;
+	math::Vec deltaPos;
+	
+	Vec pixelsOrigin;
+
+	Vec origComplexValue;
+	float origComplexLength;
+
+	int paramA;
+
+	bool editing=false;
+
+	float originalMagnituteRadiusPixels = 120.f;
+
+	ComplexXY(ComputerscareComplexBase* mod,int indexParamA) {
+		module=mod;
+		paramA = indexParamA;
+		TransparentWidget();
+	}
+
+	void onButton(const event::Button &e) override {
+
+		if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+			if(e.action == GLFW_PRESS){
+				e.consume(this);
+				editing=true;
+				clickedMousePosition = APP->scene->getMousePos();
+				if(module) {
+					float complexA = module->params[paramA].getValue();
+					float complexB = module->params[paramA+1].getValue();
+					DEBUG("orig: %f,%f",complexA,complexB);
+					origComplexValue = Vec(complexA,complexB);
+					origComplexLength=origComplexValue.norm();
+					
+					if(origComplexLength < 0.1) {
+						origComplexLength = 1;
+						pixelsOrigin = clickedMousePosition;
+					} else {
+						pixelsOrigin = clickedMousePosition.minus(origComplexValue.mult(originalMagnituteRadiusPixels/origComplexLength));
+					}
+
+
+					
+
+				}
+			} 
+		}
+	}
+
+	void onDragEnd(const event::DragEnd &e) override {
+		editing=false;
+	}
+
+	void step() {
+		if(editing && module) {
+			thisPos = APP->scene->getMousePos();
+
+			//in scaled pixels
+
+			Vec pixelsDiff = thisPos.minus(pixelsOrigin);
+			Vec newZ = pixelsDiff.div(originalMagnituteRadiusPixels).mult(origComplexLength);
+
+			DEBUG("moved %f,%f",pixelsDiff.x,newZ.y);
+			module->params[paramA].setValue(newZ.x);
+			module->params[paramA+1].setValue(newZ.y);
+
+		}
+	}
+
+	void drawLayer(const DrawArgs &args,int layer) override {
+
+		//background
+		nvgFillColor(args.vg, nvgRGB(127, 0, 0));
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, 0, 0, 10, 15);
+		nvgFill(args.vg);
+
+		if(layer==1) {
+			if(editing) {
+
+
+				nvgSave(args.vg);
+				//reset to "undo" the zoom
+				nvgReset(args.vg);
+
+				Vec circleCenter = clickedMousePosition.minus(origComplexValue.mult(originalMagnituteRadiusPixels));
+				nvgTranslate(args.vg,pixelsOrigin.x,pixelsOrigin.y);
+
+				//circle
+				nvgBeginPath(args.vg);
+	      nvgStrokeWidth(args.vg, 3.f);
+	      nvgStrokeColor(args.vg,  nvgRGB(0, 100, 200));
+	      nvgEllipse(args.vg, 0, 0,originalMagnituteRadiusPixels, originalMagnituteRadiusPixels);
+	      nvgClosePath(args.vg);
+	      nvgStroke(args.vg);
+
+
+	      //line from the zero point to the users mouse
+	      
+
+	   
+
+	    	nvgReset(args.vg);
+	      nvgBeginPath(args.vg);
+	      nvgStrokeWidth(args.vg, 5.f);
+	      nvgStrokeColor(args.vg,  nvgRGB(40, 220, 80));
+	      //Vec diff = thisPos.minus(origPosition);
+	      nvgMoveTo(args.vg, pixelsOrigin.x,pixelsOrigin.y);
+	      nvgLineTo(args.vg,thisPos.x,thisPos.y);
+
+	     	nvgClosePath(args.vg);
+	      nvgStroke(args.vg);
+
+	      nvgRestore(args.vg);
+
+			} 
+
+		}
+			
+
+		Widget::drawLayer(args,layer);
+	}
+};
+
 	struct ComplexOutport : ComputerscareSvgPort {
 		ComplexOutport() {
 			setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewR.svg")));
@@ -66,6 +194,8 @@ namespace cpx {
 
 			addChild(tw);
 			addChild(port);
+
+		
 			// addParam(createParam<SmallKnob>(Vec(rightInputX, rectInSectionY).plus(trimRelPos), module, ComputerscareNomplexPumbers::IMAGINARY_INPUT_TRIM));
 
         //addOutput(createOutput<cpx::ComplexOutport>(Vec(output1X, rectInSectionY+30), module, ComputerscareNomplexPumbers::RECT_IN_RECT_OUT ));
