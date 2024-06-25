@@ -13,6 +13,7 @@ namespace cpx {
 	math::Vec deltaPos;
 	
 	Vec pixelsOrigin;
+	Vec pixelsDiff;
 
 	Vec origComplexValue;
 	float origComplexLength;
@@ -68,7 +69,7 @@ namespace cpx {
 
 			//in scaled pixels
 
-			Vec pixelsDiff = thisPos.minus(pixelsOrigin);
+			pixelsDiff = thisPos.minus(pixelsOrigin);
 			Vec newZ = pixelsDiff.div(originalMagnituteRadiusPixels).mult(origComplexLength);
 
 			module->params[paramA].setValue(newZ.x);
@@ -88,10 +89,12 @@ namespace cpx {
 		if(layer==1) {
 			if(editing) {
 
+				float pxRatio = APP->window->pixelRatio;
 
 				nvgSave(args.vg);
 				//reset to "undo" the zoom
-				nvgReset(args.vg);
+				nvgResetTransform(args.vg);
+				nvgScale(args.vg, pxRatio, pxRatio);
 
 				nvgTranslate(args.vg,pixelsOrigin.x,pixelsOrigin.y);
 
@@ -132,23 +135,21 @@ namespace cpx {
 	     
 
 	      //line from the zero point to the original complex number
-	      Vec originalComplexPixels =origComplexValue.mult(originalMagnituteRadiusPixels/origComplexLength).plus(pixelsOrigin);
-	    	nvgReset(args.vg);
+	      Vec originalComplexPixels =origComplexValue.mult(originalMagnituteRadiusPixels/origComplexLength);
 	      nvgBeginPath(args.vg);
 	      nvgStrokeWidth(args.vg, 5.f);
 	      nvgStrokeColor(args.vg,  nvgRGB(140, 120, 80));
-	      nvgMoveTo(args.vg, pixelsOrigin.x,pixelsOrigin.y);
+	      nvgMoveTo(args.vg, 0,0);
 	      nvgLineTo(args.vg,originalComplexPixels.x,originalComplexPixels.y);
 	     	nvgClosePath(args.vg);
 	      nvgStroke(args.vg);
 
 	      //line from the zero point to the users mouse
-	    	nvgReset(args.vg);
 	      nvgBeginPath(args.vg);
 	      nvgStrokeWidth(args.vg, 5.f);
 	      nvgStrokeColor(args.vg,  nvgRGB(40, 220, 80));
-	      nvgMoveTo(args.vg, pixelsOrigin.x,pixelsOrigin.y);
-	      nvgLineTo(args.vg,thisPos.x,thisPos.y);
+	      nvgMoveTo(args.vg, 0,0);
+	      nvgLineTo(args.vg,pixelsDiff.x,pixelsDiff.y);
 	     	nvgClosePath(args.vg);
 	      nvgStroke(args.vg);
 
