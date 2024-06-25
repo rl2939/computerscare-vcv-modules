@@ -71,7 +71,6 @@ namespace cpx {
 			Vec pixelsDiff = thisPos.minus(pixelsOrigin);
 			Vec newZ = pixelsDiff.div(originalMagnituteRadiusPixels).mult(origComplexLength);
 
-			DEBUG("moved %f,%f",pixelsDiff.x,newZ.y);
 			module->params[paramA].setValue(newZ.x);
 			module->params[paramA+1].setValue(newZ.y);
 
@@ -94,10 +93,18 @@ namespace cpx {
 				//reset to "undo" the zoom
 				nvgReset(args.vg);
 
-				Vec circleCenter = clickedMousePosition.minus(origComplexValue.mult(originalMagnituteRadiusPixels));
 				nvgTranslate(args.vg,pixelsOrigin.x,pixelsOrigin.y);
 
-				//circle
+				//circle at the zero point
+				nvgBeginPath(args.vg);
+	      nvgStrokeWidth(args.vg, 3.f);
+	      nvgFillColor(args.vg,  nvgRGB(0, 22, 12));
+	      nvgEllipse(args.vg, 0, 0,10.f, 10.f);
+	      nvgClosePath(args.vg);
+	      nvgFill(args.vg);
+
+
+				//circle at the current complex value
 				nvgBeginPath(args.vg);
 	      nvgStrokeWidth(args.vg, 3.f);
 	      nvgStrokeColor(args.vg,  nvgRGB(0, 100, 200));
@@ -105,20 +112,43 @@ namespace cpx {
 	      nvgClosePath(args.vg);
 	      nvgStroke(args.vg);
 
+	      //circle at complex radius 1
+	      nvgBeginPath(args.vg);
+	      nvgStrokeWidth(args.vg, 3.f);
+	      nvgStrokeColor(args.vg,  nvgRGB(0, 220, 100));
+	      nvgEllipse(args.vg, 0, 0,originalMagnituteRadiusPixels/origComplexLength, originalMagnituteRadiusPixels/origComplexLength);
+	      nvgClosePath(args.vg);
+	      nvgStroke(args.vg);
+
+	      //circle at complex radius 10
+	      nvgBeginPath(args.vg);
+	      nvgStrokeWidth(args.vg, 3.f);
+	      nvgStrokeColor(args.vg,  nvgRGB(240, 30, 51));
+	      nvgEllipse(args.vg, 0, 0,10.f*originalMagnituteRadiusPixels/origComplexLength, 10.f*originalMagnituteRadiusPixels/origComplexLength);
+	      nvgClosePath(args.vg);
+	      nvgStroke(args.vg);
+
+
+	     
+
+	      //line from the zero point to the original complex number
+	      Vec originalComplexPixels =origComplexValue.mult(originalMagnituteRadiusPixels/origComplexLength).plus(pixelsOrigin);
+	    	nvgReset(args.vg);
+	      nvgBeginPath(args.vg);
+	      nvgStrokeWidth(args.vg, 5.f);
+	      nvgStrokeColor(args.vg,  nvgRGB(140, 120, 80));
+	      nvgMoveTo(args.vg, pixelsOrigin.x,pixelsOrigin.y);
+	      nvgLineTo(args.vg,originalComplexPixels.x,originalComplexPixels.y);
+	     	nvgClosePath(args.vg);
+	      nvgStroke(args.vg);
 
 	      //line from the zero point to the users mouse
-	      
-
-	   
-
 	    	nvgReset(args.vg);
 	      nvgBeginPath(args.vg);
 	      nvgStrokeWidth(args.vg, 5.f);
 	      nvgStrokeColor(args.vg,  nvgRGB(40, 220, 80));
-	      //Vec diff = thisPos.minus(origPosition);
 	      nvgMoveTo(args.vg, pixelsOrigin.x,pixelsOrigin.y);
 	      nvgLineTo(args.vg,thisPos.x,thisPos.y);
-
 	     	nvgClosePath(args.vg);
 	      nvgStroke(args.vg);
 
