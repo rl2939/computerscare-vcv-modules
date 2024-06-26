@@ -40,7 +40,7 @@ namespace cpx {
 				if(module) {
 					float complexA = module->params[paramA].getValue();
 					float complexB = module->params[paramA+1].getValue();
-					DEBUG("orig: %f,%f",complexA,complexB);
+
 					origComplexValue = Vec(complexA,complexB);
 					origComplexLength=origComplexValue.norm();
 					
@@ -56,6 +56,11 @@ namespace cpx {
 
 				}
 			} 
+		}
+	}
+	void onHoverKey(const HoverKeyEvent& e) override {
+		if(e.key == GLFW_KEY_ESCAPE) {
+			DEBUG("escape");
 		}
 	}
 
@@ -98,10 +103,18 @@ namespace cpx {
 
 				nvgTranslate(args.vg,pixelsOrigin.x,pixelsOrigin.y);
 
+				//circle at complex radius 1
+	      nvgBeginPath(args.vg);
+	      nvgStrokeWidth(args.vg, 3.f);
+	      nvgFillColor(args.vg,  nvgRGB(0, 10, 30));
+	      nvgEllipse(args.vg, 0, 0,originalMagnituteRadiusPixels/origComplexLength, originalMagnituteRadiusPixels/origComplexLength);
+	      nvgClosePath(args.vg);
+	      nvgFill(args.vg);
+
 				//circle at the zero point
 				nvgBeginPath(args.vg);
 	      nvgStrokeWidth(args.vg, 3.f);
-	      nvgFillColor(args.vg,  nvgRGB(0, 22, 12));
+	      nvgFillColor(args.vg,  nvgRGB(249, 220, 214));
 	      nvgEllipse(args.vg, 0, 0,10.f, 10.f);
 	      nvgClosePath(args.vg);
 	      nvgFill(args.vg);
@@ -115,13 +128,7 @@ namespace cpx {
 	      nvgClosePath(args.vg);
 	      nvgStroke(args.vg);
 
-	      //circle at complex radius 1
-	      nvgBeginPath(args.vg);
-	      nvgStrokeWidth(args.vg, 3.f);
-	      nvgStrokeColor(args.vg,  nvgRGB(0, 220, 100));
-	      nvgEllipse(args.vg, 0, 0,originalMagnituteRadiusPixels/origComplexLength, originalMagnituteRadiusPixels/origComplexLength);
-	      nvgClosePath(args.vg);
-	      nvgStroke(args.vg);
+	      
 
 	      //circle at complex radius 10
 	      nvgBeginPath(args.vg);
