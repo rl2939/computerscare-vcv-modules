@@ -8,27 +8,30 @@ using namespace rack;
 
 namespace cpx {
 
-	void drawArrowTo(NVGcontext* vg,math::Vec tipPosition) {
+	void drawArrowTo(NVGcontext* vg,math::Vec tipPosition,float baseWidth=5.f) {
 		float angle = tipPosition.arg();
 		float len = tipPosition.norm();
 
-		nvgSave(vg);
+		//nvgSave(vg);
     nvgBeginPath(vg);
-    nvgStrokeWidth(vg, 3.f);
+    nvgStrokeWidth(vg, 1.f);
     nvgStrokeColor(vg,  COLOR_COMPUTERSCARE_DARK_GREEN);
     nvgFillColor(vg,  COLOR_COMPUTERSCARE_LIGHT_GREEN);
    
 		nvgRotate(vg,angle);
-		nvgMoveTo(vg,0,-5);
-		nvgLineTo(vg,0,5);
-		nvgLineTo(vg,len,1);
-		nvgLineTo(vg,len,-1);
+		nvgMoveTo(vg,0,-baseWidth);
+		//nvgArcTo(vg,0,0,0,baseWidth/2,13);
+		nvgLineTo(vg,-2,-baseWidth/2);
+		nvgLineTo(vg,-2,baseWidth/2);
+		nvgLineTo(vg,0,baseWidth);
+		nvgLineTo(vg,len,0);
+		//nvgLineTo(vg,len,-1);
 
  		nvgClosePath(vg);
     nvgFill(vg);
     nvgStroke(vg);
 
-    nvgRestore(vg);
+   // nvgRestore(vg);
 	}
 
 
@@ -44,6 +47,8 @@ namespace cpx {
 
 	Vec origComplexValue;
 	float origComplexLength;
+
+	Vec newZ;
 
 	int paramA;
 
@@ -99,7 +104,7 @@ namespace cpx {
 			//in scaled pixels
 
 			pixelsDiff = thisPos.minus(pixelsOrigin);
-			Vec newZ = pixelsDiff.div(originalMagnituteRadiusPixels).mult(origComplexLength);
+			newZ = pixelsDiff.div(originalMagnituteRadiusPixels).mult(origComplexLength);
 
 			module->params[paramA].setValue(newZ.x);
 			module->params[paramA+1].setValue(newZ.y);
@@ -112,19 +117,18 @@ namespace cpx {
 	void draw(const DrawArgs &args) override {
 		float pxRatio = APP->window->pixelRatio;
 		//background
-		/*nvgFillColor(args.vg, nvgRGB(127, 0, 0));
-		nvgBeginPath(args.vg);
-		nvgRect(args.vg, 0, 0, 10, 15);
-		nvgFill(args.vg);*/
-		//nvgResetTransform(args.vg);
-			//	nvgScale(args.vg, 1/pxRatio, 1/pxRatio);
+
+		float fullR = box.size.x/2;
+
 		//circle at complex radius 1
-			nvgTranslate(args.vg,box.size.x/2,box.size.y/2);
+		nvgSave(args.vg);
+		//nvgResetTransform(args.vg);
+			nvgTranslate(args.vg,fullR,fullR);
 	      nvgBeginPath(args.vg);
 	      nvgStrokeWidth(args.vg, 2.f);
-	      nvgFillColor(args.vg,  nvgRGB(0, 10, 30));
+	      nvgFillColor(args.vg,  nvgRGBA(0, 10, 30,50));
 	      //nvgMoveTo(args.vg,box.size.x/2,box.size.y/2);
-	      nvgEllipse(args.vg, 0,0,box.size.x/2,box.size.y/2);
+	      nvgEllipse(args.vg, 0,0,fullR,fullR);
 	      nvgClosePath(args.vg);
 	      nvgFill(args.vg);
 
@@ -133,15 +137,12 @@ namespace cpx {
 	      nvgStrokeColor(args.vg,  nvgRGB(40, 110, 80));
 	      nvgMoveTo(args.vg, 0,0);
 
-	      Vec tip = pixelsDiff.normalize().mult(10.f);
 
-	      drawArrowTo(args.vg,tip);
+	      float length=newZ.norm();
+	      Vec tip = pixelsDiff.normalize().mult(2*fullR/M_PI*std::atanf(length));
 
-	    //  nvgLineTo(args.vg,tip.x,tip.y);
-	      //nvgLineTo(args.vg,pixelsDiff.x,pixelsDiff.y);
-	     //	nvgClosePath(args.vg);
-	    //  nvgStroke(args.vg);
-
+	      drawArrowTo(args.vg,tip,4.f);
+	      nvgRestore(args.vg);
 
 	}
 	void drawLayer(const DrawArgs &args,int layer) override {
@@ -162,7 +163,7 @@ namespace cpx {
 				//circle at complex radius 1
 	      nvgBeginPath(args.vg);
 	      nvgStrokeWidth(args.vg, 3.f);
-	      nvgFillColor(args.vg,  nvgRGB(0, 10, 30));
+	      nvgFillColor(args.vg,  nvgRGBA(0, 10, 30,60));
 	      nvgEllipse(args.vg, 0, 0,originalMagnituteRadiusPixels/origComplexLength, originalMagnituteRadiusPixels/origComplexLength);
 	      nvgClosePath(args.vg);
 	      nvgFill(args.vg);
