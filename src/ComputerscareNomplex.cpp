@@ -3,8 +3,7 @@
 
 #include <array>
 
-std::vector<std::string> wrapModeDescriptions;
-
+std::vector<std::string> wrapModeDescriptions = {"Normal (Standard Polyphonic Behavior)","Cycle (Repeat Channels)","Minimal (Pad with 0v)","Stall (Pad with final voltage)"};
 
 
 struct ComputerscareNomplexPumbers : ComputerscareComplexBase
@@ -69,10 +68,7 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
     {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
-        wrapModeDescriptions.push_back("Normal (Standard Polyphonic Behavior)");
-        wrapModeDescriptions.push_back("Cycle (Repeat Channels)");
-        wrapModeDescriptions.push_back("Minimal (Pad with 0v)");
-        wrapModeDescriptions.push_back("Stall (Pad with final voltage)");
+      
 
         configMenuParam(WRAP_MODE, 0.f, "Polyphonic Wrapping Mode", wrapModeDescriptions);
         getParamQuantity(WRAP_MODE)->randomizeEnabled = false;
