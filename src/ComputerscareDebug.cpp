@@ -21,6 +21,7 @@ struct ComputerscareDebug : ComputerscareMenuParamModule {
 		COLOR,
 		DRAW_MODE,
 		TEXT_MODE,
+		NUM_MODES=TEXT_MODE+14,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -137,6 +138,11 @@ struct ComputerscareDebug : ComputerscareMenuParamModule {
 		for (int i = 0; i < 16; i++) {
 			logLines[i] = min + spread * random::uniform();
 		}
+	}
+	void pressedChannelLabelNumber(int dex) {
+		int paramDex = (DRAW_MODE+dex)%NUM_MODES;
+		int current = params[paramDex].getValue();
+		params[paramDex].setValue((current+1)%(dex==0?drawModes.size():textModes.size()));
 	}
 
 	json_t *dataToJson() override {
@@ -595,6 +601,18 @@ struct ConnectedSmallLetter : SmallLetterDisplay {
 		index = dex;
 		value = std::to_string(dex + 1);
 	}
+	void onButton(const ButtonEvent& e) {
+			
+			if(e.action == GLFW_PRESS){
+					if(module) {
+						module->pressedChannelLabelNumber(index);
+	    				e.consume(this);
+	    			
+	    			
+					}
+				}
+					
+		}
 	void draw(const DrawArgs &ctx) override {
 		if (module) {
 			int cm = module->clockMode;
