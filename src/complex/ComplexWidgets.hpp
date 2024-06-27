@@ -3,7 +3,34 @@
 using namespace rack;
 
 
+
+
+
 namespace cpx {
+
+	void drawArrowTo(NVGcontext* vg,math::Vec tipPosition) {
+		float angle = tipPosition.arg();
+		float len = tipPosition.norm();
+
+		nvgSave(vg);
+    nvgBeginPath(vg);
+    nvgStrokeWidth(vg, 3.f);
+    nvgStrokeColor(vg,  COLOR_COMPUTERSCARE_DARK_GREEN);
+    nvgFillColor(vg,  COLOR_COMPUTERSCARE_LIGHT_GREEN);
+   
+		nvgRotate(vg,angle);
+		nvgMoveTo(vg,0,-5);
+		nvgLineTo(vg,0,5);
+		nvgLineTo(vg,len,1);
+		nvgLineTo(vg,len,-1);
+
+ 		nvgClosePath(vg);
+    nvgFill(vg);
+    nvgStroke(vg);
+
+    nvgRestore(vg);
+	}
+
 
 	struct ComplexXY : TransparentWidget {
 	ComputerscareComplexBase* module;
@@ -27,6 +54,7 @@ namespace cpx {
 	ComplexXY(ComputerscareComplexBase* mod,int indexParamA) {
 		module=mod;
 		paramA = indexParamA;
+		//box.size = Vec(30,30);
 		TransparentWidget();
 	}
 
@@ -50,10 +78,6 @@ namespace cpx {
 					} else {
 						pixelsOrigin = clickedMousePosition.minus(origComplexValue.mult(originalMagnituteRadiusPixels/origComplexLength));
 					}
-
-
-					
-
 				}
 			} 
 		}
@@ -83,14 +107,46 @@ namespace cpx {
 		}
 	}
 
-	void drawLayer(const DrawArgs &args,int layer) override {
 
+
+	void draw(const DrawArgs &args) override {
+		float pxRatio = APP->window->pixelRatio;
 		//background
-		nvgFillColor(args.vg, nvgRGB(127, 0, 0));
+		/*nvgFillColor(args.vg, nvgRGB(127, 0, 0));
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg, 0, 0, 10, 15);
-		nvgFill(args.vg);
+		nvgFill(args.vg);*/
+		//nvgResetTransform(args.vg);
+			//	nvgScale(args.vg, 1/pxRatio, 1/pxRatio);
+		//circle at complex radius 1
+			nvgTranslate(args.vg,box.size.x/2,box.size.y/2);
+	      nvgBeginPath(args.vg);
+	      nvgStrokeWidth(args.vg, 2.f);
+	      nvgFillColor(args.vg,  nvgRGB(0, 10, 30));
+	      //nvgMoveTo(args.vg,box.size.x/2,box.size.y/2);
+	      nvgEllipse(args.vg, 0,0,box.size.x/2,box.size.y/2);
+	      nvgClosePath(args.vg);
+	      nvgFill(args.vg);
 
+   			nvgBeginPath(args.vg);
+	      nvgStrokeWidth(args.vg, 2.f);
+	      nvgStrokeColor(args.vg,  nvgRGB(40, 110, 80));
+	      nvgMoveTo(args.vg, 0,0);
+
+	      Vec tip = pixelsDiff.normalize().mult(10.f);
+
+	      drawArrowTo(args.vg,tip);
+
+	    //  nvgLineTo(args.vg,tip.x,tip.y);
+	      //nvgLineTo(args.vg,pixelsDiff.x,pixelsDiff.y);
+	     //	nvgClosePath(args.vg);
+	    //  nvgStroke(args.vg);
+
+
+	}
+	void drawLayer(const DrawArgs &args,int layer) override {
+
+		
 		if(layer==1) {
 			if(editing) {
 
@@ -152,29 +208,21 @@ namespace cpx {
 	      nvgStroke(args.vg);
 
 	      //line from the zero point to the users mouse
-	      nvgBeginPath(args.vg);
-	      nvgStrokeWidth(args.vg, 5.f);
-	      nvgStrokeColor(args.vg,  nvgRGB(40, 220, 80));
-	      nvgMoveTo(args.vg, 0,0);
-	      nvgLineTo(args.vg,pixelsDiff.x,pixelsDiff.y);
-	     	nvgClosePath(args.vg);
-	      nvgStroke(args.vg);
-
+	      
+	      drawArrowTo(args.vg,pixelsDiff);
+	     	
+	    
 	      nvgRestore(args.vg);
-
 			} 
-
 		}
-			
-
 		Widget::drawLayer(args,layer);
 	}
 };
 
+
 	struct ComplexOutport : ComputerscareSvgPort {
 		ComplexOutport() {
-			setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewR.svg")));
-
+			//setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewR.svg")));
 		}
 	};
 

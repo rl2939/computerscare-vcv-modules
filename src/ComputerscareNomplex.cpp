@@ -46,13 +46,12 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         POLAR_IN_POLAR_OUT=POLAR_IN_RECT_OUT+2,
         NUM_OUTPUTS=POLAR_IN_POLAR_OUT+2
     };
+
     enum LightIds
     {
         BLINK_LIGHT,
         NUM_LIGHTS
     };
-
-
 
     enum wrapModes {
         WRAP_NORMAL,
@@ -346,8 +345,8 @@ struct ComputerscareNomplexPumbersWidget : ModuleWidget
         Vec channelsKnobRelPos = Vec(-50.f,25.f);
 
         cpx::ComplexXY* xy = new cpx::ComplexXY(module,ComputerscareNomplexPumbers::COMPLEX_CONSTANT_A);
-        xy->box.size=Vec(10,20);
-        xy->box.pos=Vec(70,30);
+        xy->box.size=Vec(10,10);
+        xy->box.pos=Vec(70,40);
         addChild(xy);
 
 
