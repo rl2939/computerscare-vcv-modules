@@ -356,7 +356,7 @@ struct ComputerscareNomplexPumbersWidget : ModuleWidget
         Vec channelsKnobRelPos = Vec(-50.f,25.f);
 
         cpx::ComplexXY* xy = new cpx::ComplexXY(module,ComputerscareNomplexPumbers::COMPLEX_CONSTANT_A);
-        xy->box.size=Vec(10,10);
+        xy->box.size=Vec(15,15);
         xy->box.pos=Vec(70,40);
         addChild(xy);
 
@@ -382,7 +382,7 @@ struct ComputerscareNomplexPumbersWidget : ModuleWidget
         addChild(rectInChannelWidget);
 
         cpx::ComplexXY* uv = new cpx::ComplexXY(module,ComputerscareNomplexPumbers::COMPLEX_CONSTANT_U);
-        uv->box.size=Vec(10,10);
+        uv->box.size=Vec(15,15);
         uv->box.pos=Vec(70,180);
         addChild(uv);
 
