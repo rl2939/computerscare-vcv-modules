@@ -28,6 +28,8 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         POLAR_IN_POLAR_OUT_MODE,
         COMPLEX_CONSTANT_A,
         COMPLEX_CONSTANT_B,
+        COMPLEX_CONSTANT_U,
+        COMPLEX_CONSTANT_V,
         NUM_PARAMS
     };
     enum InputIds
@@ -104,6 +106,9 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
 
         configParam(COMPLEX_CONSTANT_A,-10.f,10.f,0.f,"Complex A");
         configParam(COMPLEX_CONSTANT_B,-10.f,10.f,0.f,"Complex B");
+
+        configParam(COMPLEX_CONSTANT_U,-10.f,10.f,0.f,"Complex U");
+        configParam(COMPLEX_CONSTANT_V,-10.f,10.f,0.f,"Complex V");
 
         configOutput(RECT_IN_RECT_OUT, "Rectangular Input, Rectangular #1-8");
         configOutput(RECT_IN_RECT_OUT + 1, "Rectangular Input, Rectangular #9-16");
@@ -233,6 +238,9 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         float xyParamX = params[COMPLEX_CONSTANT_A].getValue();
         float xyParamY = params[COMPLEX_CONSTANT_A+1].getValue();
 
+        float rtParamX = params[COMPLEX_CONSTANT_U].getValue();
+        float rtParamY = params[COMPLEX_CONSTANT_U+1].getValue();
+
         float realOffsetKnob = params[REAL_INPUT_OFFSET].getValue();
         float realTrimKnob = params[REAL_INPUT_TRIM].getValue();
 
@@ -248,10 +256,10 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         for(int rectInputCh = 0; rectInputCh < numRectInOutputChannels; rectInputCh++) {
             int outputBlock = rectInputCh > 7 ? 1 : 0;
 
-            std::array<int,2> channelIndices = getInputChannels(rectInputCh,numRealInputChannels,numImaginaryInputChannels);
+            std::array<int,2> inputChannelIndices = getInputChannels(rectInputCh,numRealInputChannels,numImaginaryInputChannels);
 
-            int realInputCh=channelIndices[0];
-            int imInputCh=channelIndices[1];
+            int realInputCh=inputChannelIndices[0];
+            int imInputCh=inputChannelIndices[1];
 
             float x = inputs[REAL_IN].getVoltage(realInputCh)*realTrimKnob + realOffsetKnob + xyParamX;
             float y = inputs[IMAGINARY_IN].getVoltage(imInputCh)*imaginaryTrimKnob + imaginaryOffsetKnob + xyParamY;
@@ -269,19 +277,22 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         for(int polarInputCh = 0; polarInputCh < compolyChannelsPolarIn; polarInputCh++) {
             int outputBlock = polarInputCh > 7 ? 1 : 0;
 
-            std::array<int,2> channelIndices = getInputChannels(polarInputCh,numModulusInputChannels,numArgumentInputChannels);
+            std::array<int,2> inputChannelIndices = getInputChannels(polarInputCh,numModulusInputChannels,numArgumentInputChannels);
 
-            int modInputChannel=channelIndices[0];
-            int argInputChannel=channelIndices[1];
+            int modInputChannel=inputChannelIndices[0];
+            int argInputChannel=inputChannelIndices[1];
 
-            float r = inputs[MODULUS_IN].getVoltage(modInputChannel)*modulusTrimKnob + modulusOffsetKnob;
-            float theta = inputs[ARGUMENT_IN].getVoltage(argInputChannel)*argumentTrimKnob + argumentOffsetKnob;
+            float r0 = inputs[MODULUS_IN].getVoltage(modInputChannel)*modulusTrimKnob + modulusOffsetKnob;
+            float theta0 = inputs[ARGUMENT_IN].getVoltage(argInputChannel)*argumentTrimKnob + argumentOffsetKnob;
+
+            float x = r0*std::cos(theta0)+rtParamX;
+            float y = r0*std::sin(theta0)+rtParamY;
+
+            float r = std::hypot(x,y);
+            float theta = std::atan2(y,x);
 
             outputs[POLAR_IN_POLAR_OUT + outputBlock].setVoltage(r,polarInputCh*2 % 16);
             outputs[POLAR_IN_POLAR_OUT + outputBlock].setVoltage(theta,(polarInputCh*2+1) % 16);
-
-            float x = r*std::cos(theta);
-            float y = r*std::sin(theta);
 
             outputs[POLAR_IN_RECT_OUT + outputBlock].setVoltage(x,polarInputCh*2 % 16);
             outputs[POLAR_IN_RECT_OUT + outputBlock].setVoltage(y,(polarInputCh*2+1) % 16);
@@ -369,6 +380,11 @@ struct ComputerscareNomplexPumbersWidget : ModuleWidget
         rectInChannelWidget = new PolyOutputChannelsWidget(Vec(output2X+64, rectInSectionY+26).plus(channelsKnobRelPos), module, ComputerscareNomplexPumbers::COMPOLY_CHANNELS_RECT_IN,&module->compolyChannelsRectIn);
 
         addChild(rectInChannelWidget);
+
+        cpx::ComplexXY* uv = new cpx::ComplexXY(module,ComputerscareNomplexPumbers::COMPLEX_CONSTANT_U);
+        uv->box.size=Vec(10,10);
+        uv->box.pos=Vec(70,180);
+        addChild(uv);
 
         addInput(createInput<InPort>(Vec(leftInputX, polarInSectionY), module, ComputerscareNomplexPumbers::MODULUS_IN));
         addParam(createParam<SmoothKnob>(Vec(leftInputX, polarInSectionY).plus(offsetRelPos), module, ComputerscareNomplexPumbers::MODULUS_INPUT_OFFSET));
