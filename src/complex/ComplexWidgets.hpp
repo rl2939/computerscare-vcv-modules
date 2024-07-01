@@ -21,8 +21,9 @@ namespace cpx {
 		nvgRotate(vg,angle);
 		nvgMoveTo(vg,0,-baseWidth);
 		//nvgArcTo(vg,0,0,0,baseWidth/2,13);
-		nvgLineTo(vg,-2,-baseWidth/2);
-		nvgLineTo(vg,-2,baseWidth/2);
+		//nvgLineTo(vg,-2,-baseWidth/2);
+		//nvgLineTo(vg,-2,baseWidth/2);
+		nvgQuadTo(vg,baseWidth/2,0,0,baseWidth);
 		nvgLineTo(vg,0,baseWidth);
 		nvgLineTo(vg,len,0);
 		//nvgLineTo(vg,len,-1);
@@ -141,7 +142,7 @@ namespace cpx {
 	      float length=newZ.norm();
 	      Vec tip = pixelsDiff.normalize().mult(2*fullR/M_PI*std::atanf(length));
 
-	      drawArrowTo(args.vg,tip,4.f);
+	      drawArrowTo(args.vg,tip,box.size.x/7);
 	      nvgRestore(args.vg);
 
 	}
