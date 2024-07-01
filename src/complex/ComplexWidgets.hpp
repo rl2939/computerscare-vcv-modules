@@ -109,7 +109,10 @@ namespace cpx {
 
 			module->params[paramA].setValue(newZ.x);
 			module->params[paramA+1].setValue(newZ.y);
-
+		} else {
+			if(module) {
+				newZ = Vec(module->params[paramA].getValue(),module->params[paramA+1].getValue());
+			}
 		}
 	}
 
@@ -140,7 +143,7 @@ namespace cpx {
 
 
 	      float length=newZ.norm();
-	      Vec tip = pixelsDiff.normalize().mult(2*fullR/M_PI*std::atanf(length));
+	      Vec tip = newZ.normalize().mult(2*fullR/M_PI*std::atanf(length));
 
 	      drawArrowTo(args.vg,tip,box.size.x/7);
 	      nvgRestore(args.vg);
