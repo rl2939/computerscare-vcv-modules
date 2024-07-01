@@ -8,7 +8,7 @@ using namespace rack;
 
 namespace cpx {
 
-	void drawArrowTo(NVGcontext* vg,math::Vec tipPosition,float baseWidth=5.f) {
+	inline void drawArrowTo(NVGcontext* vg,math::Vec tipPosition,float baseWidth=5.f) {
 		float angle = tipPosition.arg();
 		float len = tipPosition.norm();
 
@@ -242,24 +242,55 @@ namespace cpx {
 		}
 	};
 
+template <typename BASE>
+struct CompolyInOrOutWidget : Widget {
+	ComputerscareComplexBase* module;
+	int paramID;
+	int numPorts = 2;
+	int lastOutMode = -1;
+	std::vector<BASE*> ports;
 
-	struct CompolyOutWidget : Widget {
+	void step() {
+		if(module) {
+			int outMode = module->params[paramID].getValue();
+
+			if(lastOutMode != outMode) {
+				lastOutMode = outMode;
+						if(ports[0] && ports[1]) {
+							if(outMode==0) {
+								ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewL.svg")));
+								ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewL.svg")));
+							} else if(outMode==1) {
+								ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantL.svg")));
+								ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantL.svg")));
+							} else if(outMode==2) {
+								ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewL.svg")));
+								ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewR.svg")));
+							} else if(outMode==3) {
+								ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantR.svg")));
+								ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantL.svg")));
+							}
+						}
+					}
+			}
+			
+		Widget::step();
+	}
+};
+
+
+	struct CompolyOutWidget : CompolyInOrOutWidget<ComplexOutport> {
 		ComplexOutport* port;
-		std::vector<ComplexOutport*> ports;
-		int paramID;
-		int numPorts = 2;
-		int lastOutMode = -1;
-		ComputerscareComplexBase* module;
-
-		CompolyOutWidget(math::Vec pos,ComputerscareComplexBase *cModule, int portID,int compolyTypeParamID) {
+		
+		CompolyOutWidget(math::Vec pos,ComputerscareComplexBase *cModule, int firstPortID,int compolyTypeParamID,float scale=1.0,bool isOutput=true) {
 
 			module=cModule;
 			paramID = compolyTypeParamID;
 			CompolyTypeLabelSwitch* compolyLabel = createParam<CompolyTypeLabelSwitch>(Vec(0,0),cModule,compolyTypeParamID);
 
 			TransformWidget* tw = new TransformWidget();
-			tw->box.pos = pos.minus(Vec(40,0));
-			tw->scale(1.0);
+			tw->box.pos = pos.minus(Vec(20,0));
+			tw->scale(scale);
 
 			tw->addChild(compolyLabel);
 			addChild(tw);
@@ -267,8 +298,12 @@ namespace cpx {
 			ports.resize(numPorts);
 
 			for(int i = 0; i < numPorts; i++) {
-
-				port = createOutput<ComplexOutport>(pos,cModule,portID+i);
+				if(isOutput) {
+					port = createOutput<ComplexOutport>(pos,cModule,firstPortID+i);
+				}
+				else {
+					port = createInput<ComplexOutport>(pos,cModule,firstPortID+i);
+				}
 				ports[i] = port;
 				pos=pos.plus(Vec(40,0));
 				addChild(port);
@@ -276,34 +311,6 @@ namespace cpx {
 			
       
 		}
-		void step() {
-			if(module) {
-
-				int outMode = module->params[paramID].getValue();
-
-				if(lastOutMode != outMode) {
-					lastOutMode = outMode;
-							if(ports[0] && ports[1]) {
-								if(outMode==0) {
-
-									ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewL.svg")));
-									ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewL.svg")));
-								} else if(outMode==1) {
-									ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantL.svg")));
-									ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantL.svg")));
-								} else if(outMode==2) {
-									ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewL.svg")));
-									ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewR.svg")));
-								} else if(outMode==3) {
-									ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantR.svg")));
-									ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantL.svg")));
-								}
-								
-							}
-						}
-				}
-				
-			Widget::step();
-		}
+		
 	};
 }

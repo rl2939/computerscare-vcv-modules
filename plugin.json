@@ -170,13 +170,21 @@
 			"manualUrl":
 				"https://github.com/freddyz/computerscare-vcv-modules/blob/master/doc/horse-a-doodle-do.md"
 		},
-			{
-			"slug": "computerscare-nomplex-pumbers",
-			"name": "Nomplex Pumbers",
-			"description": "Complex Number Generator",
-			"tags": ["Utility",  "Polyphonic"],
-			"manualUrl":
-				"https://github.com/freddyz/computerscare-vcv-modules/blob/master/doc/nomplex-pumbers.md"
+		{
+		"slug": "computerscare-nomplex-pumbers",
+		"name": "Nomplex Pumbers",
+		"description": "Complex Number Generator",
+		"tags": ["Utility",  "Polyphonic"],
+		"manualUrl":
+			"https://github.com/freddyz/computerscare-vcv-modules/blob/master/doc/nomplex-pumbers.md"
+		},
+		{
+		"slug": "computerscare-complex-generator",
+		"name": "Complex Generator",
+		"description": "Complex Number Generator",
+		"tags": ["Utility",  "Polyphonic"],
+		"manualUrl":
+			"https://github.com/freddyz/computerscare-vcv-modules/blob/master/doc/complex-generator.md"
 		}
 
 

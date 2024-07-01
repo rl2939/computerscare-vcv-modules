@@ -38,6 +38,7 @@ extern Model *modelComputerscareDrolyPaw;
 extern Model *modelComputerscareTolyPoolsV2;
 
 extern Model *modelComputerscareNomplexPumbers;
+extern Model *modelComputerscareComplexGenerator;
 
 static const NVGcolor COLOR_COMPUTERSCARE_DARK_GREEN = nvgRGB(0x24, 0x55, 0x59);
 static const NVGcolor COLOR_COMPUTERSCARE_LIGHT_GREEN = nvgRGB(0xC0, 0xE7, 0xDE);
@@ -582,4 +583,3 @@ struct SmallLetterDisplay : Widget {
 #include "ComputerscarePolyModule.hpp"
 #include "MenuParams.hpp"
 #include "complex/ComputerscareComplexBase.cpp"
-

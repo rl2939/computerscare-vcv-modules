@@ -29,4 +29,5 @@ void init(Plugin *p) {
 	p->addModel(modelComputerscareTolyPoolsV2);
 
 	p->addModel(modelComputerscareNomplexPumbers);
+	p->addModel(modelComputerscareComplexGenerator);
 }
