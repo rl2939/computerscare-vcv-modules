@@ -89,13 +89,29 @@ struct ComputerscareComplexGenerator : ComputerscareComplexBase {
 	void process(const ProcessArgs &args) override {
 		ComputerscarePolyModule::checkCounter();
 		float trim = params[GLOBAL_SCALE].getValue();
+		
 		float offsetX = params[OFFSET_VAL_AB].getValue();
 		float offsetY = params[OFFSET_VAL_AB+1].getValue();
+
+		float scaleX = params[SCALE_VAL_AB].getValue();
+		float scaleY = params[SCALE_VAL_AB+1].getValue();
+
+		math::Vec scaleRect = Vec(scaleX,scaleY);
+
+
+
+
 		for (int i = 0; i < polyChannels; i++) {
 			if(i < 8) {
 
-				outputs[COMPOLY_MAIN_OUT_A].setVoltage(params[COMPLEX_XY + 2*i].getValue()*trim + offsetX, 2*i);
-				outputs[COMPOLY_MAIN_OUT_A].setVoltage(params[COMPLEX_XY + 2*i+1].getValue()*trim + offsetY, 2*i+1);
+				float x0 = params[COMPLEX_XY + 2*i].getValue();
+				float y0 = params[COMPLEX_XY + 2*i+1].getValue();
+
+				float x1 = x0*scaleRect.x - y0*scaleRect.y;
+				float y1 = x0*scaleRect.y + y0*scaleRect.x;
+
+				outputs[COMPOLY_MAIN_OUT_A].setVoltage(x1 + offsetX, 2*i);
+				outputs[COMPOLY_MAIN_OUT_A].setVoltage(y1 + offsetY, 2*i+1);
 			} 
 			
 			//outputs[POLY_OUTPUT].setVoltage(params[KNOB + i].getValue()*trim + offset, i);
@@ -180,15 +196,20 @@ struct ComputerscareComplexGeneratorWidget : ModuleWidget {
 
 		addChild(channelWidget);
 
-		cpx::CompolyOutWidget* outRect1 = new cpx::CompolyOutWidget(Vec(30, 22),module,ComputerscareComplexGenerator::COMPOLY_MAIN_OUT_A,ComputerscareComplexGenerator::MAIN_OUTPUT_MODE,0.6);
-    addChild(outRect1);
+		cpx::CompolyOutWidget* mainOutput = new cpx::CompolyOutWidget(Vec(60, 350),module,ComputerscareComplexGenerator::COMPOLY_MAIN_OUT_A,ComputerscareComplexGenerator::MAIN_OUTPUT_MODE,0.6);
+    addChild(mainOutput);
 
 
 
     cpx::ComplexXY* offsetValAB = new cpx::ComplexXY(module,ComputerscareComplexGenerator::OFFSET_VAL_AB);
-     offsetValAB->box.size=Vec(25,25);
-     offsetValAB->box.pos=Vec(32, 57);
-     addChild(offsetValAB);
+    offsetValAB->box.size=Vec(25,25);
+    offsetValAB->box.pos=Vec(32, 27);
+    addChild(offsetValAB);
+
+    cpx::ComplexXY* scaleValAB = new cpx::ComplexXY(module,ComputerscareComplexGenerator::SCALE_VAL_AB);
+    scaleValAB->box.size=Vec(25,25);
+    scaleValAB->box.pos=Vec(5, 27);
+    addChild(scaleValAB);
 
 		//addParam(createParam<NoRandomSmallKnob>(Vec(11, 54), module, ComputerscareComplexGenerator::GLOBAL_SCALE));
 		//addParam(createParam<NoRandomMediumSmallKnob>(Vec(32, 57), module, ComputerscareComplexGenerator::GLOBAL_OFFSET));
@@ -196,7 +217,7 @@ struct ComputerscareComplexGeneratorWidget : ModuleWidget {
 
 		float xx;
 		float yy;
-		float yInitial = 86;
+		float yInitial = 56;
 		float ySpacing =  34;
 		float yRightColumnOffset = 14.3 / 8;
 		for (int i = 0; i < numComplexGeneratorKnobs; i++) {

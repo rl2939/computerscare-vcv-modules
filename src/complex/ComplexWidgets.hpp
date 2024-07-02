@@ -305,7 +305,7 @@ struct CompolyInOrOutWidget : Widget {
 					port = createInput<ComplexOutport>(pos,cModule,firstPortID+i);
 				}
 				ports[i] = port;
-				pos=pos.plus(Vec(40,0));
+				pos=pos.plus(Vec(30,0));
 				addChild(port);
 			}
 			
