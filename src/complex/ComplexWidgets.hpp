@@ -242,6 +242,9 @@ namespace cpx {
 		}
 	};
 
+
+
+
 template <typename BASE>
 struct CompolyInOrOutWidget : Widget {
 	ComputerscareComplexBase* module;
@@ -249,6 +252,39 @@ struct CompolyInOrOutWidget : Widget {
 	int numPorts = 2;
 	int lastOutMode = -1;
 	std::vector<BASE*> ports;
+	SvgWidget* leftLabel;
+	SvgWidget* rightLabel;
+
+	CompolyInOrOutWidget() {
+		TransformWidget* tw = new TransformWidget();
+		//tw->box.pos = pos.minus(Vec(20,0));
+		tw->scale(1.0);
+
+		
+
+		leftLabel = new SvgWidget();
+		leftLabel->setSVG(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-labels/r.svg")));
+		//leftLabel->box.pos = box.pos;
+		tw->addChild(leftLabel);
+
+		rightLabel = new SvgWidget();
+		rightLabel->setSVG(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-labels/r.svg")));
+		//rightLabel->box.pos = box.pos.plus(Vec(20,0));
+		tw->addChild(rightLabel);
+
+		//tw->addChild(compolyLabel);
+		addChild(tw);
+	}
+
+	void setLabels(std::string leftFilename,std:: string rightFilename) {
+		leftLabel->setSVG(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-labels/"+leftFilename)));
+		rightLabel->setSVG(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-labels/"+rightFilename)));
+		rightLabel->visible=true;
+	}
+	void setLabels(std::string leftFilename) {
+		leftLabel->setSVG(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-labels/"+leftFilename)));
+		rightLabel->visible=false;
+	}
 
 	void step() {
 		if(module) {
@@ -260,15 +296,21 @@ struct CompolyInOrOutWidget : Widget {
 							if(outMode==0) {
 								ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewL.svg")));
 								ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewL.svg")));
+								//leftLabel->setSVG(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-labels/r.svg")));
+								setLabels("xy.svg");
 							} else if(outMode==1) {
 								ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantL.svg")));
 								ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantL.svg")));
+								
+								setLabels("rtheta.svg");
 							} else if(outMode==2) {
 								ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewL.svg")));
 								ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewR.svg")));
+								setLabels("x.svg","yy.svg");
 							} else if(outMode==3) {
 								ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantR.svg")));
 								ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantL.svg")));
+								setLabels("r.svg","theta.svg");
 							}
 						}
 					}
@@ -277,6 +319,26 @@ struct CompolyInOrOutWidget : Widget {
 		Widget::step();
 	}
 };
+/*struct LogoWidget : SvgWidget {
+	ComputerscareBlankExpander *module;
+	int motherConnected = -1;
+	LogoWidget() {
+		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/computerscare-logo-normal.svg")));
+		SvgWidget();
+	}
+	void step() override {
+		if (module) {
+			if (module->motherConnected != motherConnected) {
+				if (module->motherConnected) {
+					setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/computerscare-logo-normal.svg")));
+				} else {
+					setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/computerscare-logo-sad.svg")));
+				}
+			}
+			motherConnected = module->motherConnected;
+		}
+	}
+};*/
 
 
 	struct CompolyOutWidget : CompolyInOrOutWidget<ComplexOutport> {
@@ -298,17 +360,21 @@ struct CompolyInOrOutWidget : Widget {
 			ports.resize(numPorts);
 
 			for(int i = 0; i < numPorts; i++) {
+				math::Vec myPos = pos.plus(Vec(30*i,0));
 				if(isOutput) {
-					port = createOutput<ComplexOutport>(pos,cModule,firstPortID+i);
+					port = createOutput<ComplexOutport>(myPos,cModule,firstPortID+i);
 				}
 				else {
-					port = createInput<ComplexOutport>(pos,cModule,firstPortID+i);
+					port = createInput<ComplexOutport>(myPos,cModule,firstPortID+i);
 				}
 				ports[i] = port;
-				pos=pos.plus(Vec(30,0));
 				addChild(port);
 			}
+
+			leftLabel->box.pos = Vec(pos.plus(Vec(0,-25)));
+			rightLabel->box.pos = Vec(pos.plus(Vec(35,-25)));
 			
+			//CompolyInOrOutWidget<ComplexOutport>::CompolyInOrOutWidget(pos);	
       
 		}
 		
