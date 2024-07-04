@@ -106,17 +106,17 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         configParam(COMPLEX_CONSTANT_U,-10.f,10.f,0.f,"Complex U");
         configParam(COMPLEX_CONSTANT_V,-10.f,10.f,0.f,"Complex V");
 
-        configOutput(RECT_IN_RECT_OUT, "Rectangular Input, Rectangular #1-8");
-        configOutput(RECT_IN_RECT_OUT + 1, "Rectangular Input, Rectangular #9-16");
+        configOutput<cpx::CompolyPortInfo<RECT_IN_RECT_OUT_MODE,0>>(RECT_IN_RECT_OUT, "Rectangular Input");
+        configOutput<cpx::CompolyPortInfo<RECT_IN_RECT_OUT_MODE,1>>(RECT_IN_RECT_OUT + 1, "Rectangular Input");
 
-        configOutput(RECT_IN_POLAR_OUT, "Rectangular Input, Polar #1-8");
-        configOutput(RECT_IN_POLAR_OUT + 1, "Rectangular Input, Polar #9-16");
+        configOutput<cpx::CompolyPortInfo<RECT_IN_RECT_OUT_MODE+1,0>>(RECT_IN_POLAR_OUT, "Rectangular Input");
+        configOutput<cpx::CompolyPortInfo<RECT_IN_RECT_OUT_MODE+1,1>>(RECT_IN_POLAR_OUT + 1, "Rectangular Input");
 
-        configOutput(POLAR_IN_RECT_OUT, "Polar Input, Rectangular #1-8");
-        configOutput(POLAR_IN_RECT_OUT + 1, "Polar Input, Rectangular #9-16");
+        configOutput<cpx::CompolyPortInfo<POLAR_IN_RECT_OUT_MODE,0>>(POLAR_IN_RECT_OUT, "Polar Input");
+        configOutput<cpx::CompolyPortInfo<POLAR_IN_RECT_OUT_MODE,1>>(POLAR_IN_RECT_OUT + 1, "Polar Input");
 
-        configOutput(POLAR_IN_POLAR_OUT, "Polar Input, Polar #1-8");
-        configOutput(POLAR_IN_POLAR_OUT + 1, "Polar Input, Polar #9-16");
+        configOutput<cpx::CompolyPortInfo<POLAR_IN_RECT_OUT_MODE+1,0>>(POLAR_IN_POLAR_OUT, "Polar Input");
+        configOutput<cpx::CompolyPortInfo<POLAR_IN_RECT_OUT_MODE+1,1>>(POLAR_IN_POLAR_OUT + 1, "Polar Input");
     }
 
 

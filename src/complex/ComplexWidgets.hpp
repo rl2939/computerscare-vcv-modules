@@ -241,6 +241,29 @@ namespace cpx {
 		}
 	};
 
+	template <int TModeParamIndex,int blockNum=0>
+	struct CompolyPortInfo : PortInfo {
+
+		std::string getName() override{
+			return name + ", " + getModeName();
+		}
+		std::string getModeName() {
+			if(module) {
+				int mode = module->params[TModeParamIndex].getValue();
+					if(mode == 0) {
+					return blockNum==0 ? "x,y #1-8" : "x,y #9-16";
+				} else if(mode == 1) {
+					return blockNum==0 ? "r,θ #1-8" : "r,θ #9-16";
+				}else if(mode == 2) {
+					return blockNum==0 ? "x" : "y";
+				}else if(mode == 3) {
+					return blockNum==0 ? "r" : "θ";
+				}
+			}
+			return "";
+		}
+	};
+
 	struct ComplexOutport : ComputerscareSvgPort {
 		ComplexOutport() {
 			//setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewR.svg")));
