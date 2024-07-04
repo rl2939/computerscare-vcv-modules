@@ -224,6 +224,22 @@ namespace cpx {
 	}
 };
 
+	struct CompolyModeParam : ParamQuantity {
+		std::string getDisplayValueString() override {
+			int mode = getValue();
+			if(mode == 0) {
+				return "Rectangular Interleaved";
+			} else if(mode == 1) {
+				return "Polar Interleaved";
+			}else if(mode == 2) {
+				return "Rectangular Separated";
+			}else if(mode == 3) {
+				return "Polar Separated";
+			}
+			
+			//return disp == "0" ? "Auto" : disp;
+		}
+	};
 
 	struct ComplexOutport : ComputerscareSvgPort {
 		ComplexOutport() {

@@ -95,10 +95,10 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         configParam(ARGUMENT_INPUT_OFFSET,-10.f,10.f,0.f,"Argument Input Offset"," radians");
         configParam(ARGUMENT_INPUT_TRIM,-2.f,2.f,1.f,"Argument Input Attenuversion");
 
-        configParam(RECT_IN_RECT_OUT_MODE,0.f,3.f,0.f,"Rect Input Rect Output Mode");
-        configParam(RECT_IN_POLAR_OUT_MODE,0.f,3.f,0.f,"Rect Input Output Mode");
-        configParam(POLAR_IN_RECT_OUT_MODE,0.f,3.f,0.f,"Polar Input Output Mode");
-        configParam(POLAR_IN_POLAR_OUT_MODE,0.f,3.f,0.f,"Polar Input Output Mode");
+        configParam<cpx::CompolyModeParam>(RECT_IN_RECT_OUT_MODE,0.f,3.f,0.f,"Rect Output 1 Mode");
+        configParam<cpx::CompolyModeParam>(RECT_IN_POLAR_OUT_MODE,0.f,3.f,0.f,"Rect Output 2 Mode");
+        configParam<cpx::CompolyModeParam>(POLAR_IN_RECT_OUT_MODE,0.f,3.f,0.f,"Polar Output 1 Mode");
+        configParam<cpx::CompolyModeParam>(POLAR_IN_POLAR_OUT_MODE,0.f,3.f,0.f,"Polar Output 2 Mode");
 
         configParam(COMPLEX_CONSTANT_A,-10.f,10.f,0.f,"Complex A");
         configParam(COMPLEX_CONSTANT_B,-10.f,10.f,0.f,"Complex B");
@@ -201,6 +201,42 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
 
     }
 
+    void setOutputVoltages(int outIndex,int outMode,int compChannelIndex,float x, float y, float r, float theta) {
+        int outputBlock = compChannelIndex > 7 ? 1 : 0;
+        if(outMode==0) {
+            //interleaved rectangular
+            outputs[outIndex+outputBlock].setVoltage(x,(compChannelIndex*2) % 16);
+            outputs[outIndex+outputBlock].setVoltage(y,(compChannelIndex*2+1) % 16);
+        } else if(outMode==1) {
+            //interleaved polar
+            outputs[outIndex+outputBlock].setVoltage(r,(compChannelIndex*2) % 16);
+            outputs[outIndex+outputBlock].setVoltage(theta,(compChannelIndex*2+1) % 16);
+        } else if(outMode==2) {
+            //separated rectangular
+            outputs[outIndex].setVoltage(x,compChannelIndex);
+            outputs[outIndex+1].setVoltage(y,compChannelIndex);
+        } else if(outMode==3) {
+            //separated polar
+            outputs[outIndex].setVoltage(r,compChannelIndex);
+            outputs[outIndex+1].setVoltage(theta,compChannelIndex);
+        }
+    }
+
+    void setOutputChannels(int outIndex,int outMode,int compolyChannels) {
+        if(outMode==0 || outMode ==1) {
+            //interleaved
+            int numTotalPolyChannels = compolyChannels*2;
+            int numChannels1 = numTotalPolyChannels >= 16 ? 16 : numTotalPolyChannels;
+            int numChannels2 = numTotalPolyChannels >= 16 ? numTotalPolyChannels-16 : 0;
+
+            outputs[outIndex+0].setChannels(numChannels1);
+            outputs[outIndex+1].setChannels(numChannels2);
+        } else {
+            outputs[outIndex+0].setChannels(compolyChannels);
+            outputs[outIndex+1].setChannels(compolyChannels);
+        }
+    }
+
     void process(const ProcessArgs &args) override {
         ComputerscarePolyModule::checkCounter();
 
@@ -209,27 +245,16 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         int numModulusInputChannels = inputs[MODULUS_IN].getChannels();
         int numArgumentInputChannels = inputs[ARGUMENT_IN].getChannels();
 
-        int numRectInOutputChannels =  compolyChannelsRectIn * 2;
-        int numPolarInOutputChannels = compolyChannelsPolarIn * 2;
+        int out1mode = params[RECT_IN_RECT_OUT_MODE].getValue();
+        int out2mode = params[RECT_IN_RECT_OUT_MODE+1].getValue();
+        int out3mode = params[RECT_IN_RECT_OUT_MODE+2].getValue();
+        int out4mode = params[RECT_IN_RECT_OUT_MODE+3].getValue();
 
-        int numRectInOutChannels1 = numRectInOutputChannels >= 16 ? 16 : numRectInOutputChannels;
-        int numRectInOutChannels2 = numRectInOutputChannels >= 16 ? numRectInOutputChannels-16 : 0;
+        setOutputChannels(RECT_IN_RECT_OUT,out1mode,compolyChannelsRectIn);
+        setOutputChannels(RECT_IN_POLAR_OUT,out2mode,compolyChannelsRectIn);
 
-        outputs[RECT_IN_RECT_OUT+0].setChannels(numRectInOutChannels1);
-        outputs[RECT_IN_RECT_OUT+1].setChannels(numRectInOutChannels2);
-
-        outputs[RECT_IN_POLAR_OUT+0].setChannels(numRectInOutChannels1);
-        outputs[RECT_IN_POLAR_OUT+1].setChannels(numRectInOutChannels2);
-
-        int numPolarInOutChannels1 = numPolarInOutputChannels >= 16 ? 16 : numPolarInOutputChannels;
-        int numPolarInOutChannels2 = numPolarInOutputChannels >= 16 ? numPolarInOutputChannels-16 : 0;
-
-        outputs[POLAR_IN_RECT_OUT+0].setChannels(numPolarInOutChannels1);
-        outputs[POLAR_IN_RECT_OUT+1].setChannels(numPolarInOutChannels2);
-
-        outputs[POLAR_IN_POLAR_OUT+0].setChannels(numPolarInOutChannels1);
-        outputs[POLAR_IN_POLAR_OUT+1].setChannels(numPolarInOutChannels2);
-
+        setOutputChannels(POLAR_IN_RECT_OUT,out3mode,compolyChannelsPolarIn);
+        setOutputChannels(POLAR_IN_POLAR_OUT,out4mode,compolyChannelsPolarIn);
 
         float xyParamX = params[COMPLEX_CONSTANT_A].getValue();
         float xyParamY = params[COMPLEX_CONSTANT_A+1].getValue();
@@ -249,9 +274,7 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         float argumentOffsetKnob = params[ARGUMENT_INPUT_OFFSET].getValue();
         float argumentTrimKnob = params[ARGUMENT_INPUT_TRIM].getValue();
 
-        for(int rectInputCh = 0; rectInputCh < numRectInOutputChannels; rectInputCh++) {
-            int outputBlock = rectInputCh > 7 ? 1 : 0;
-
+        for(int rectInputCh = 0; rectInputCh < compolyChannelsRectIn; rectInputCh++) {
             std::array<int,2> inputChannelIndices = getInputChannels(rectInputCh,numRealInputChannels,numImaginaryInputChannels);
 
             int realInputCh=inputChannelIndices[0];
@@ -260,19 +283,14 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
             float x = inputs[REAL_IN].getVoltage(realInputCh)*realTrimKnob + realOffsetKnob + xyParamX;
             float y = inputs[IMAGINARY_IN].getVoltage(imInputCh)*imaginaryTrimKnob + imaginaryOffsetKnob + xyParamY;
 
-            outputs[RECT_IN_RECT_OUT + outputBlock].setVoltage(x,rectInputCh*2 % 16);
-            outputs[RECT_IN_RECT_OUT + outputBlock].setVoltage(y,(rectInputCh*2+1) % 16);
-
             float r = std::hypot(x,y);
             float arg = std::atan2(y,x);
 
-            outputs[RECT_IN_POLAR_OUT + outputBlock].setVoltage(r,rectInputCh*2 % 16);
-            outputs[RECT_IN_POLAR_OUT + outputBlock].setVoltage(arg,(rectInputCh*2+1) % 16);
+            setOutputVoltages(RECT_IN_RECT_OUT,out1mode,rectInputCh,x,y,r,arg);
+            setOutputVoltages(RECT_IN_POLAR_OUT,out2mode,rectInputCh,x,y,r,arg);
         }
 
         for(int polarInputCh = 0; polarInputCh < compolyChannelsPolarIn; polarInputCh++) {
-            int outputBlock = polarInputCh > 7 ? 1 : 0;
-
             std::array<int,2> inputChannelIndices = getInputChannels(polarInputCh,numModulusInputChannels,numArgumentInputChannels);
 
             int modInputChannel=inputChannelIndices[0];
@@ -287,11 +305,9 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
             float r = std::hypot(x,y);
             float theta = std::atan2(y,x);
 
-            outputs[POLAR_IN_POLAR_OUT + outputBlock].setVoltage(r,polarInputCh*2 % 16);
-            outputs[POLAR_IN_POLAR_OUT + outputBlock].setVoltage(theta,(polarInputCh*2+1) % 16);
+            setOutputVoltages(POLAR_IN_RECT_OUT,out3mode,polarInputCh,x,y,r,theta);
+            setOutputVoltages(POLAR_IN_POLAR_OUT,out4mode,polarInputCh,x,y,r,theta);
 
-            outputs[POLAR_IN_RECT_OUT + outputBlock].setVoltage(x,polarInputCh*2 % 16);
-            outputs[POLAR_IN_RECT_OUT + outputBlock].setVoltage(y,(polarInputCh*2+1) % 16);
         }  
     }
 
