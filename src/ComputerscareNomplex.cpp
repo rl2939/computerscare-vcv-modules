@@ -338,7 +338,7 @@ struct ComputerscareNomplexPumbersWidget : ModuleWidget
      
 
         const int rectInSectionY = 70;
-        const int polarInSectionY = 220;
+        const int polarInSectionY = 240;
 
         const int leftInputX = 25;
         const int rightInputX = 100;
@@ -353,7 +353,7 @@ struct ComputerscareNomplexPumbersWidget : ModuleWidget
 
         cpx::ComplexXY* xy = new cpx::ComplexXY(module,ComputerscareNomplexPumbers::COMPLEX_CONSTANT_A);
         xy->box.size=Vec(30,30);
-        xy->box.pos=Vec(70,40);
+        xy->box.pos=Vec(60,30);
         addChild(xy);
 
 
@@ -366,11 +366,11 @@ struct ComputerscareNomplexPumbersWidget : ModuleWidget
         addParam(createParam<SmoothKnob>(Vec(rightInputX, rectInSectionY).plus(offsetRelPos), module, ComputerscareNomplexPumbers::IMAGINARY_INPUT_OFFSET));
         addParam(createParam<SmallKnob>(Vec(rightInputX, rectInSectionY).plus(trimRelPos), module, ComputerscareNomplexPumbers::IMAGINARY_INPUT_TRIM));
 
-        cpx::CompolyOutWidget* outRect1 = new cpx::CompolyOutWidget(Vec(output1X, rectInSectionY+30),module,ComputerscareNomplexPumbers::RECT_IN_RECT_OUT,ComputerscareNomplexPumbers::RECT_IN_RECT_OUT_MODE);
+        cpx::CompolyOutWidget* outRect1 = new cpx::CompolyOutWidget(Vec(output1X, rectInSectionY+40),module,ComputerscareNomplexPumbers::RECT_IN_RECT_OUT,ComputerscareNomplexPumbers::RECT_IN_RECT_OUT_MODE);
         addChild(outRect1);
 
 
-         cpx::CompolyOutWidget* outRect2 = new cpx::CompolyOutWidget(Vec(output1X, rectInSectionY+70),module,ComputerscareNomplexPumbers::RECT_IN_POLAR_OUT,ComputerscareNomplexPumbers::RECT_IN_RECT_OUT_MODE+1);
+         cpx::CompolyOutWidget* outRect2 = new cpx::CompolyOutWidget(Vec(output1X, rectInSectionY+90),module,ComputerscareNomplexPumbers::RECT_IN_POLAR_OUT,ComputerscareNomplexPumbers::RECT_IN_RECT_OUT_MODE+1);
         addChild(outRect2);
 
         rectInChannelWidget = new PolyOutputChannelsWidget(Vec(output2X+64, rectInSectionY+26).plus(channelsKnobRelPos), module, ComputerscareNomplexPumbers::COMPOLY_CHANNELS_RECT_IN,&module->compolyChannelsRectIn);
@@ -378,8 +378,8 @@ struct ComputerscareNomplexPumbersWidget : ModuleWidget
         addChild(rectInChannelWidget);
 
         cpx::ComplexXY* uv = new cpx::ComplexXY(module,ComputerscareNomplexPumbers::COMPLEX_CONSTANT_U);
-        uv->box.size=Vec(15,15);
-        uv->box.pos=Vec(70,180);
+        uv->box.size=Vec(30,30);
+        uv->box.pos=Vec(60,200);
         addChild(uv);
 
         addInput(createInput<InPort>(Vec(leftInputX, polarInSectionY), module, ComputerscareNomplexPumbers::MODULUS_IN));
@@ -391,11 +391,11 @@ struct ComputerscareNomplexPumbersWidget : ModuleWidget
         addParam(createParam<SmoothKnob>(Vec(rightInputX, polarInSectionY).plus(offsetRelPos), module, ComputerscareNomplexPumbers::ARGUMENT_INPUT_OFFSET));
         addParam(createParam<SmallKnob>(Vec(rightInputX, polarInSectionY).plus(trimRelPos), module, ComputerscareNomplexPumbers::ARGUMENT_INPUT_TRIM));
 
-          cpx::CompolyOutWidget* outPolar1 = new cpx::CompolyOutWidget(Vec(output1X, polarInSectionY+30),module,ComputerscareNomplexPumbers::POLAR_IN_RECT_OUT,ComputerscareNomplexPumbers::POLAR_IN_RECT_OUT_MODE);
+          cpx::CompolyOutWidget* outPolar1 = new cpx::CompolyOutWidget(Vec(output1X, polarInSectionY+40),module,ComputerscareNomplexPumbers::POLAR_IN_RECT_OUT,ComputerscareNomplexPumbers::POLAR_IN_RECT_OUT_MODE);
         addChild(outPolar1);
 
 
-          cpx::CompolyOutWidget* outPolar2 = new cpx::CompolyOutWidget(Vec(output1X, polarInSectionY+70),module,ComputerscareNomplexPumbers::POLAR_IN_POLAR_OUT,ComputerscareNomplexPumbers::POLAR_IN_RECT_OUT_MODE+1);
+          cpx::CompolyOutWidget* outPolar2 = new cpx::CompolyOutWidget(Vec(output1X, polarInSectionY+90),module,ComputerscareNomplexPumbers::POLAR_IN_POLAR_OUT,ComputerscareNomplexPumbers::POLAR_IN_RECT_OUT_MODE+1);
         addChild(outPolar2);
 
         polarInChannelWidget = new PolyOutputChannelsWidget(Vec(output2X+64, polarInSectionY+30).plus(channelsKnobRelPos), module, ComputerscareNomplexPumbers::COMPOLY_CHANNELS_POLAR_IN,&module->compolyChannelsPolarIn);

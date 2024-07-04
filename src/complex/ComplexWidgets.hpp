@@ -242,6 +242,22 @@ namespace cpx {
 		}
 	};
 
+	struct ScaledSvgWidget : TransformWidget {
+		SvgWidget* svg;
+		ScaledSvgWidget(float scale) {
+			TransformWidget* tw = new TransformWidget();
+			tw->scale(scale);
+			svg = new SvgWidget();
+			
+			tw->addChild(svg);
+
+			addChild(tw);
+		}
+		void setSVG(std::string path) {
+			svg->setSVG(APP->window->loadSvg(asset::plugin(pluginInstance, path)));
+		}
+	};
+
 
 
 
@@ -252,37 +268,56 @@ struct CompolyInOrOutWidget : Widget {
 	int numPorts = 2;
 	int lastOutMode = -1;
 	std::vector<BASE*> ports;
-	SvgWidget* leftLabel;
-	SvgWidget* rightLabel;
+	ScaledSvgWidget* leftLabel;
+	ScaledSvgWidget* rightLabel;
+	TransformWidget* leftTW;
+	TransformWidget* rightTW;
 
-	CompolyInOrOutWidget() {
-		TransformWidget* tw = new TransformWidget();
+	CompolyInOrOutWidget(math::Vec pos) {
+		/*Widget* leftLabelWidget = new Widget();
+		Widget* rightLabelWidget = new Widget();
+
+		leftTW = new TransformWidget();
+		rightTW = new TransformWidget();
+		
+		leftTW->scale(0.7);
+		rightTW->scale(1.2);*/
+
+	//	leftTW->box.pos = pos;
+		//rightTW->box.pos = pos;
+		
 		//tw->box.pos = pos.minus(Vec(20,0));
-		tw->scale(1.0);
+		//tw->scale(1.0);
 
 		
 
-		leftLabel = new SvgWidget();
-		leftLabel->setSVG(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-labels/r.svg")));
+		leftLabel = new ScaledSvgWidget(0.5);
+		leftLabel->box.pos = pos.minus(Vec(0,10));
+		leftLabel->setSVG("res/complex-labels/r.svg");
 		//leftLabel->box.pos = box.pos;
-		tw->addChild(leftLabel);
+		//leftTW->addChild(leftLabel);
 
-		rightLabel = new SvgWidget();
-		rightLabel->setSVG(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-labels/r.svg")));
+		rightLabel = new ScaledSvgWidget(0.5);
+		rightLabel->box.pos = pos.plus(Vec(50,-10));
+		rightLabel->setSVG("res/complex-labels/r.svg");
 		//rightLabel->box.pos = box.pos.plus(Vec(20,0));
-		tw->addChild(rightLabel);
+		//rightTW->addChild(rightLabel);
+
+		//leftLabelWidget->addChild(leftTW);
+		//rightLabelWidget->addChild(rightTW);
 
 		//tw->addChild(compolyLabel);
-		addChild(tw);
+		addChild(leftLabel);
+		addChild(rightLabel);
 	}
 
 	void setLabels(std::string leftFilename,std:: string rightFilename) {
-		leftLabel->setSVG(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-labels/"+leftFilename)));
-		rightLabel->setSVG(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-labels/"+rightFilename)));
+		leftLabel->setSVG("res/complex-labels/"+leftFilename);
+		rightLabel->setSVG("res/complex-labels/"+rightFilename);
 		rightLabel->visible=true;
 	}
 	void setLabels(std::string leftFilename) {
-		leftLabel->setSVG(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-labels/"+leftFilename)));
+		leftLabel->setSVG("res/complex-labels/"+leftFilename);
 		rightLabel->visible=false;
 	}
 
@@ -344,14 +379,14 @@ struct CompolyInOrOutWidget : Widget {
 	struct CompolyOutWidget : CompolyInOrOutWidget<ComplexOutport> {
 		ComplexOutport* port;
 		
-		CompolyOutWidget(math::Vec pos,ComputerscareComplexBase *cModule, int firstPortID,int compolyTypeParamID,float scale=1.0,bool isOutput=true) {
+		CompolyOutWidget(math::Vec pos,ComputerscareComplexBase *cModule, int firstPortID,int compolyTypeParamID,float scale=1.0,bool isOutput=true) : CompolyInOrOutWidget(pos) {
 
 			module=cModule;
 			paramID = compolyTypeParamID;
 			CompolyTypeLabelSwitch* compolyLabel = createParam<CompolyTypeLabelSwitch>(Vec(0,0),cModule,compolyTypeParamID);
 
 			TransformWidget* tw = new TransformWidget();
-			tw->box.pos = pos.minus(Vec(20,0));
+			tw->box.pos = pos.minus(Vec(40,0));
 			tw->scale(scale);
 
 			tw->addChild(compolyLabel);
@@ -371,8 +406,8 @@ struct CompolyInOrOutWidget : Widget {
 				addChild(port);
 			}
 
-			leftLabel->box.pos = Vec(pos.plus(Vec(0,-25)));
-			rightLabel->box.pos = Vec(pos.plus(Vec(35,-25)));
+			//leftLabel->box.pos = Vec(pos.plus(Vec(0,-25)));
+			//rightLabel->box.pos = Vec(pos.plus(Vec(35,-25)));
 			
 			//CompolyInOrOutWidget<ComplexOutport>::CompolyInOrOutWidget(pos);	
       
