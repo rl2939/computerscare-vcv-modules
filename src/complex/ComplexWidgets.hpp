@@ -112,6 +112,8 @@ namespace cpx {
 		} else {
 			if(module) {
 				newZ = Vec(module->params[paramA].getValue(),module->params[paramA+1].getValue());
+			} else {
+				newZ = Vec(-10 + 20* random::uniform(),-10 + 20* random::uniform());
 			}
 		}
 	}
@@ -307,45 +309,22 @@ struct CompolyInOrOutWidget : Widget {
 	int numPorts = 2;
 	int lastOutMode = -1;
 	std::vector<BASE*> ports;
+	
 	ScaledSvgWidget* leftLabel;
 	ScaledSvgWidget* rightLabel;
-	TransformWidget* leftTW;
-	TransformWidget* rightTW;
+
 
 	CompolyInOrOutWidget(math::Vec pos) {
-		/*Widget* leftLabelWidget = new Widget();
-		Widget* rightLabelWidget = new Widget();
-
-		leftTW = new TransformWidget();
-		rightTW = new TransformWidget();
-		
-		leftTW->scale(0.7);
-		rightTW->scale(1.2);*/
-
-	//	leftTW->box.pos = pos;
-		//rightTW->box.pos = pos;
-		
-		//tw->box.pos = pos.minus(Vec(20,0));
-		//tw->scale(1.0);
-
-		
 
 		leftLabel = new ScaledSvgWidget(0.5);
 		leftLabel->box.pos = pos.minus(Vec(0,10));
 		leftLabel->setSVG("res/complex-labels/r.svg");
-		//leftLabel->box.pos = box.pos;
-		//leftTW->addChild(leftLabel);
+
 
 		rightLabel = new ScaledSvgWidget(0.5);
 		rightLabel->box.pos = pos.plus(Vec(50,-10));
 		rightLabel->setSVG("res/complex-labels/r.svg");
-		//rightLabel->box.pos = box.pos.plus(Vec(20,0));
-		//rightTW->addChild(rightLabel);
 
-		//leftLabelWidget->addChild(leftTW);
-		//rightLabelWidget->addChild(rightTW);
-
-		//tw->addChild(compolyLabel);
 		addChild(leftLabel);
 		addChild(rightLabel);
 	}
@@ -394,26 +373,6 @@ struct CompolyInOrOutWidget : Widget {
 		Widget::step();
 	}
 };
-/*struct LogoWidget : SvgWidget {
-	ComputerscareBlankExpander *module;
-	int motherConnected = -1;
-	LogoWidget() {
-		setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/computerscare-logo-normal.svg")));
-		SvgWidget();
-	}
-	void step() override {
-		if (module) {
-			if (module->motherConnected != motherConnected) {
-				if (module->motherConnected) {
-					setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/computerscare-logo-normal.svg")));
-				} else {
-					setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/computerscare-logo-sad.svg")));
-				}
-			}
-			motherConnected = module->motherConnected;
-		}
-	}
-};*/
 
 
 	struct CompolyOutWidget : CompolyInOrOutWidget<ComplexOutport> {
@@ -445,12 +404,6 @@ struct CompolyInOrOutWidget : Widget {
 				ports[i] = port;
 				addChild(port);
 			}
-
-			//leftLabel->box.pos = Vec(pos.plus(Vec(0,-25)));
-			//rightLabel->box.pos = Vec(pos.plus(Vec(35,-25)));
-			
-			//CompolyInOrOutWidget<ComplexOutport>::CompolyInOrOutWidget(pos);	
-      
 		}
 		
 	};
