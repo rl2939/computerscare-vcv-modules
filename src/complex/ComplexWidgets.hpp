@@ -359,6 +359,10 @@ struct CompolyInOrOutWidget : Widget {
 		leftLabel->setSVG("res/complex-labels/"+leftFilename);
 		rightLabel->visible=false;
 	}
+	void setPorts(std::string leftPortFilename,std::string rightPortFilename) {
+		ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/"+leftPortFilename)));
+		ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/"+rightPortFilename)));
+	}
 
 	void step() {
 		if(module) {
@@ -368,26 +372,23 @@ struct CompolyInOrOutWidget : Widget {
 				lastOutMode = outMode;
 						if(ports[0] && ports[1]) {
 							if(outMode==0) {
-								ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewL.svg")));
-								ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewL.svg")));
-								//leftLabel->setSVG(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-labels/r.svg")));
+								setPorts("complex-outjack-skewL.svg","complex-outjack-skewL.svg");
 								setLabels("xy.svg");
 							} else if(outMode==1) {
-								ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantL.svg")));
-								ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantL.svg")));
-								
+								setPorts("complex-outjack-slantL.svg","complex-outjack-slantL.svg");
 								setLabels("rtheta.svg");
 							} else if(outMode==2) {
-								ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewL.svg")));
-								ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-skewR.svg")));
+								setPorts("complex-outjack-skewL.svg","complex-outjack-skewR.svg");
 								setLabels("x.svg","yy.svg");
 							} else if(outMode==3) {
-								ports[0]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantR.svg")));
-								ports[1]->setSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/complex-outjack-slantL.svg")));
+								setPorts("complex-outjack-slantR.svg","complex-outjack-slantL.svg");
 								setLabels("r.svg","theta.svg");
 							}
 						}
 					}
+			} else {
+				setPorts("complex-outjack-skewL.svg","complex-outjack-skewL.svg");
+				setLabels("xy.svg");
 			}
 			
 		Widget::step();
