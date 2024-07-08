@@ -145,7 +145,7 @@ namespace cpx {
 
 
 	      float length=newZ.norm();
-	      Vec tip = newZ.normalize().mult(2*fullR/M_PI*std::atanhf(length));
+	      Vec tip = newZ.normalize().mult(2*fullR/M_PI*std::atan(length));
 
 	      drawArrowTo(args.vg,tip,box.size.x/7);
 	      nvgRestore(args.vg);
