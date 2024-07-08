@@ -39,7 +39,7 @@ struct ComputerscareDebug : ComputerscareMenuParamModule {
 		NUM_LIGHTS
 	};
 
-	std::vector<std::string> drawModes = {"Off","Horizontal Bars", "Dots", "Arrows", "Connected Arrows", "Horse"};
+	std::vector<std::string> drawModes = {"Off","Horizontal Bars", "Dots", "Lines", "Lines+Dot","Connected Shape", "Connected Shape + Dots"};
 	std::vector<std::string> textModes= {"Off","Poly List","Complex Rect","Complex Polar"};
 
 	float logLines[NUM_LINES] = {0.f};
@@ -388,8 +388,11 @@ struct DebugViz : TransparentWidget {
 						thicknesses.push_back(Vec(260 / (17.f), 0));
 					}
 					draw.drawLines(pts.get(), rThetaVec, colors, thicknesses);
-			} else if(drawMode==2) {
+			} else if(drawMode==2 || drawMode == 3 || drawMode == 4 || drawMode == 5|| drawMode == 6) {
 					//draw as dots, assuming [x0,y0,x1,y1,...]
+
+
+
 					float xx[16] = {};
 					float yy[16] = {};
 					float colorsToDraw[16] = {1.f};
@@ -434,11 +437,37 @@ struct DebugViz : TransparentWidget {
 					std::vector<Vec> polyVals;
 					std::vector<NVGcolor> colors;
 					std::vector<Vec> thicknesses;
+				
+			
+					std::vector<Vec> pointsVec = pts.get();
+					Points allOrigin = Points();
+					allOrigin.linear(numPoints,Vec(0,0),Vec(0,0));
 
 					for (int i = 0; i < 16; i++) {
 						colors.push_back(draw.sincolor(-colorsToDraw[i]/3, {1, 1, 2}));
 					}
-					draw.drawDots(pts.get(),colors,5.f);
+
+					//std::vector<Vec> rthetaVec = rthetaVec.linear(16, Vec(0, 0), Vec(0, 0));
+					Points rtheta = Points();
+					rtheta.linear(numPoints, Vec(40, 0), Vec(0, 12));
+
+					if(drawMode==2) {
+						draw.drawDots(pointsVec,colors,5.f);
+					} else if(drawMode==3) {
+						//lines from origin
+						draw.drawLinesFromTo(allOrigin.get(),pts.get(),nvgRGB(30,120,230),1.2f);
+					} else if(drawMode == 4) {
+						//thin line and dot
+						draw.drawLinesFromTo(allOrigin.get(),pts.get(),nvgRGBA(30,120,230,100),1.2f);
+						draw.drawDots(pointsVec,colors,5.f);
+					} else if(drawMode == 5) {
+						//connected shape
+						draw.drawShape(pointsVec,nvgRGBA(30,120,230,50),nvgRGB(120,0,40),1.f);
+					} else if(drawMode == 6) {
+						//connected shape and dots
+						draw.drawShape(pointsVec,nvgRGBA(30,120,230,50),nvgRGB(120,0,40),1.f);
+						draw.drawDots(pointsVec,colors,5.f);
+					}
 				
 			}
 		}

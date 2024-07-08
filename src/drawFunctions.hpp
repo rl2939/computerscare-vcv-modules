@@ -7,15 +7,7 @@ struct DrawHelper {
   DrawHelper(NVGcontext* ctx) {
     vg = ctx;
   }
-  void drawShape(std::vector<Vec> points, NVGcolor fillColor = COLOR_COMPUTERSCARE_PINK) {
-    drawShape(points, fillColor, COLOR_COMPUTERSCARE_TRANSPARENT, 0.f);
-  }
-  void drawShape(std::vector<Vec> points, NVGcolor fillColor, NVGcolor strokeColor) {
-    drawShape(points, fillColor, strokeColor, 1.f);
-  }
-  void drawShape(std::vector<Vec> points, NVGcolor strokeColor, float thickness) {
-    drawShape(points, COLOR_COMPUTERSCARE_TRANSPARENT, strokeColor, thickness);
-  }
+
   void drawShape(std::vector<Vec> points, NVGcolor fillColor, NVGcolor strokeColor, float thickness) {
     unsigned int n = points.size();
     nvgSave(vg);
@@ -120,6 +112,29 @@ struct DrawHelper {
       thickness *= expf(dThickness);
 
     }
+    nvgRestore(vg);
+  }
+  void drawOneLine(float x0,float y0, float x1, float y1, NVGcolor strokeColor = COLOR_COMPUTERSCARE_RED, float thickness = 1.f) {
+      nvgStrokeColor(vg, strokeColor);
+      nvgStrokeWidth(vg, thickness);
+
+
+      nvgBeginPath(vg);
+      nvgMoveTo(vg, x0,y0);
+      nvgLineTo(vg, x1,y1);
+      nvgStroke(vg);
+      nvgClosePath(vg);
+    
+  }
+  void drawLinesFromTo(std::vector<Vec> pointsFrom, std::vector<Vec> pointsTo, NVGcolor strokeColor = COLOR_COMPUTERSCARE_RED, float thickness = 1.f) {
+    unsigned int n = pointsFrom.size();
+    nvgSave(vg);
+
+    for (unsigned int i = 0; i < n; i++) {
+      drawOneLine(pointsFrom[i].x, pointsFrom[i].y,pointsTo[i].x , pointsTo[i].y,strokeColor,thickness);
+
+    }
+    
     nvgRestore(vg);
   }
   void drawField(std::vector<Vec> points, NVGcolor strokeColor = BLACK, float length = 4, float thickness = 1.f) {
