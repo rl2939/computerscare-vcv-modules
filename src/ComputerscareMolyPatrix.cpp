@@ -45,9 +45,7 @@ struct ComputerscareMolyPatrix : ComputerscarePolyModule {
   ComputerscareMolyPatrix()  {
 
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-    /*for(int n = 0; n < numKnobs; n++) {
-      configParam(KNOB+n,-1.f,1.f,0.f);
-    }*/
+
     for (int i = 0; i < numRows; i++) {
       configParam(INPUT_ROW_TRIM + i, -2.f, 2.f, 1.f, "Input Channel " + std::to_string(i + 1) + " Attenuation");
       configParam(OUTPUT_COLUMN_TRIM + i, -2.f, 2.f, 1.f, "Output Channel " + std::to_string(i + 1) + " Attenuation");
@@ -60,9 +58,9 @@ struct ComputerscareMolyPatrix : ComputerscarePolyModule {
       }
 
     }
-    configParam(OUTPUT_TRIM, -2.f, 2.f, 1.f, "Output Attenuation");
+    configParam(OUTPUT_TRIM, -2.f, 2.f, 1.f, "Output VCA Level");
     configParam(OUTPUT_OFFSET, -10.f, 10.f, 0.f, "Output Offset");
-    configParam(INPUT_TRIM, -2.f, 2.f, 1.f, "Input Attenuation");
+    configParam(INPUT_TRIM, -2.f, 2.f, 1.f, "Input VCA Level");
     configParam(INPUT_OFFSET, -10.f, 10.f, 0.f, "Input Offset");
     getParamQuantity(OUTPUT_TRIM)->randomizeEnabled = false;
     getParamQuantity(OUTPUT_OFFSET)->randomizeEnabled = false;
@@ -70,14 +68,14 @@ struct ComputerscareMolyPatrix : ComputerscarePolyModule {
     getParamQuantity(INPUT_OFFSET)->randomizeEnabled = false;
 
 
-    configParam<AutoParamQuantity>(POLY_CHANNELS, 0.f, 16.f, 0.f, "Poly Channels");
+    configParam<AutoParamQuantity>(POLY_CHANNELS, 0.f, 16.f, 0.f, "Output Polyphony");
     getParamQuantity(POLY_CHANNELS)->randomizeEnabled = false;
     getParamQuantity(POLY_CHANNELS)->resetEnabled = false;
 
     configInput(POLY_INPUT, "Main");
 
-    configInput(INPUT_ATTENUATION_CV, "Input Attenuation");
-    configInput(OUTPUT_ATTENUATION_CV, "Output Attenuation");
+    configInput(INPUT_ATTENUATION_CV, "Input VCA");
+    configInput(OUTPUT_ATTENUATION_CV, "Output VCA");
 
     configOutput(POLY_OUTPUT, "Main");
 
@@ -145,33 +143,56 @@ struct DisableableSmallKnob : RoundKnob {
 
   std::shared_ptr<Svg> enabledSvg = APP->window->loadSvg(asset::plugin(pluginInstance, "res/computerscare-small-knob-effed.svg"));
   std::shared_ptr<Svg> disabledSvg = APP->window->loadSvg(asset::plugin(pluginInstance, "res/computerscare-small-knob-effed-disabled.svg"));
+  std::shared_ptr<Svg> negativeSvg = APP->window->loadSvg(asset::plugin(pluginInstance, "res/computerscare-small-knob-effed-red.svg"));
+  std::shared_ptr<Svg> negativeDark = APP->window->loadSvg(asset::plugin(pluginInstance, "res/computerscare-small-knob-effed-dark-red.svg"));
+  
+  std::vector<std::shared_ptr<Svg>> negativeThemes = {negativeSvg,negativeDark};
+
 
   int inputChannel = 0;
   int outputChannel = 0;
   int themeIndex = 0;
+  int paramIndex = 0;
+
   bool disabled = false;
   bool initialized = false;
   bool randomizable = true;
+  bool negative = false;
   ComputerscareMolyPatrix *module;
+
 
   DisableableSmallKnob() {
     setSvg(enabledThemes[themeIndex]);
-    shadow->box.size = math::Vec(0, 0);
     shadow->opacity = 0.f;
   }
 
   void draw(const DrawArgs& args) override {
     if (module) {
       bool candidateDisabled = (module->numInputChannels != 0 && inputChannel > module->numInputChannels - 1 || outputChannel > module->polyChannels - 1) ;
-      if (disabled != candidateDisabled || !initialized) {
-        setSvg(candidateDisabled ? disabledSvg : enabledThemes[themeIndex]);
+      float value = module->params[paramIndex].getValue();
+
+      nvgAlpha(args.vg,math::clamp(abs(value)+.1,.1,1.f));
+
+      if (disabled != candidateDisabled || !initialized || (value < 0 != negative)) {
+        if(candidateDisabled) {
+          setSvg(disabledSvg);
+        } else {
+          if(value < 0) {
+            setSvg(negativeThemes[themeIndex]);
+          } else {
+
+             setSvg(enabledThemes[themeIndex]);
+          }
+        }
         disabled = candidateDisabled;
+        negative = value < 0;
         onChange(*(new event::Change()));
         fb->dirty = true;
         initialized = true;
       }
     }
     else {
+      nvgAlpha(args.vg,random::uniform()-.3);
     }
     RoundKnob::draw(args);
   }
@@ -182,15 +203,11 @@ struct ComputerscareMolyPatrixWidget : ModuleWidget {
   ComputerscareMolyPatrixWidget(ComputerscareMolyPatrix *module) {
 
     setModule(module);
-
-    //setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/ComputerscareMolyPatrixPanel.svg")));
     box.size = Vec(28 * 15, 380);
     {
       ComputerscareSVGPanel *panel = new ComputerscareSVGPanel();
       panel->box.size = box.size;
       panel->setBackground(APP->window->loadSvg(asset::plugin(pluginInstance, "res/ComputerscareMolyPatrixPanel.svg")));
-
-      //module->panelRef = panel;
 
       addChild(panel);
 
@@ -209,10 +226,6 @@ struct ComputerscareMolyPatrixWidget : ModuleWidget {
     addInput(createInput<TinyJack>(Vec(inX + 41, 25), module, ComputerscareMolyPatrix::INPUT_ATTENUATION_CV));
 
     addParam(createParam<SmoothKnobNoRandom>(Vec(inX + 58, 14), module, ComputerscareMolyPatrix::INPUT_OFFSET));
-
-
-    //addKnob(60, 16, module, ComputerscareMolyPatrix::INPUT_TRIM, 0, 0,1,0);
-
 
     for (int i = 0; i < numRows; i++) {
       for (int j = 0; j < numColumns; j++) {
@@ -242,10 +255,13 @@ struct ComputerscareMolyPatrixWidget : ModuleWidget {
 
   }
   void addKnob(int x, int y, ComputerscareMolyPatrix *module, int index, int row, int column, int theme = 0, bool randomizable = true) {
+    int paramIndex = ComputerscareMolyPatrix::KNOB + index;
 
-    knob = createParam<DisableableSmallKnob>(Vec(x, y), module, ComputerscareMolyPatrix::KNOB + index);
+    knob = createParam<DisableableSmallKnob>(Vec(x, y), module, paramIndex);
+
 
     knob->module = module;
+    knob->paramIndex=paramIndex;
     knob->inputChannel = row;
     knob->outputChannel = column;
     knob->themeIndex = theme;
