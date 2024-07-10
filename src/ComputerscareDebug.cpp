@@ -19,9 +19,11 @@ struct ComputerscareDebug : ComputerscareMenuParamModule {
 		SWITCH_VIEW,
 		WHICH_CLOCK,
 		COLOR,
+
 		DRAW_MODE,
 		TEXT_MODE,
-		NUM_MODES=TEXT_MODE+14,
+		COMPOSITE_OP,
+		OTHER_MODES=COMPOSITE_OP+13,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -41,6 +43,9 @@ struct ComputerscareDebug : ComputerscareMenuParamModule {
 
 	std::vector<std::string> drawModes = {"Off","Horizontal Bars", "Dots", "Lines", "Lines+Dot","Connected Shape", "Connected Shape + Dots"};
 	std::vector<std::string> textModes= {"Off","Poly List","Complex Rect","Complex Polar"};
+	std::vector<std::string> compOps = {"NVG_SOURCE_OVER","NVG_SOURCE_IN","NVG_SOURCE_OUT","NVG_ATOP","NVG_DESTINATION_OVER","NVG_DESTINATION_IN","NVG_DESTINATION_OUT","NVG_DESTINATION_ATOP","NVG_LIGHTER","NVG_COPY","NVG_XOR"};
+
+	std::vector<std::vector<std::string>> allModes = {drawModes,textModes,compOps};
 
 	float logLines[NUM_LINES] = {0.f};
 
@@ -87,6 +92,7 @@ struct ComputerscareDebug : ComputerscareMenuParamModule {
 
 		configMenuParam(DRAW_MODE, 0.f, "Draw Mode", drawModes);
 		configMenuParam(TEXT_MODE, 1.f, "Text Mode", textModes);
+		configMenuParam(COMPOSITE_OP, 0.f, "Composite Operation", compOps);
 
 		configInput(VAL_INPUT, "Value");
 		configInput(TRG_INPUT, "Clock");
@@ -140,9 +146,11 @@ struct ComputerscareDebug : ComputerscareMenuParamModule {
 		}
 	}
 	void pressedChannelLabelNumber(int dex) {
-		int paramDex = (DRAW_MODE+dex)%NUM_MODES;
+		int paramDex = (DRAW_MODE+dex)%OTHER_MODES;
+		int currentModeNumOptions = allModes[dex % allModes.size()].size();
 		int current = params[paramDex].getValue();
-		params[paramDex].setValue((current+1)%(dex==0?drawModes.size():textModes.size()));
+
+		params[paramDex].setValue((current+1)%(currentModeNumOptions));
 	}
 
 	json_t *dataToJson() override {
@@ -333,8 +341,10 @@ struct DebugViz : TransparentWidget {
 	}
 	void drawLayer(const BGPanel::DrawArgs& args, int layer) override {
 		int drawMode = 1;
+		int globalCompositeOperation = 0;
 		if(module) {
 			drawMode=module->params[ComputerscareDebug::DRAW_MODE].getValue();
+			globalCompositeOperation=module->params[ComputerscareDebug::COMPOSITE_OP].getValue();
 		}
 	
 			if (layer == 1) {
@@ -390,7 +400,7 @@ struct DebugViz : TransparentWidget {
 					draw.drawLines(pts.get(), rThetaVec, colors, thicknesses);
 			} else if(drawMode==2 || drawMode == 3 || drawMode == 4 || drawMode == 5|| drawMode == 6) {
 					//draw as dots, assuming [x0,y0,x1,y1,...]
-
+					nvgGlobalCompositeOperation(args.vg, globalCompositeOperation);
 
 
 					float xx[16] = {};
@@ -846,6 +856,7 @@ void addLabeledKnob(std::string label, int x, int y, ComputerscareDebug *module,
 
 	ParamSelectMenu *drawModeMenu;
 	ParamSelectMenu *textModeMenu;
+	ParamSelectMenu *compOpMenu;
 
 	ComputerscareResizeHandle *leftHandle;
 	ComputerscareResizeHandle *rightHandle;
@@ -884,6 +895,12 @@ void ComputerscareDebugWidget::appendContextMenu(Menu *menu)
   textModeMenu->param = debug->paramQuantities[ComputerscareDebug::TEXT_MODE];
   textModeMenu->options = debug->textModes;
   menu->addChild(textModeMenu);
+
+  compOpMenu = new ParamSelectMenu();
+  compOpMenu->text = "Global Composite Operation";
+  compOpMenu->param = debug->paramQuantities[ComputerscareDebug::COMPOSITE_OP];
+  compOpMenu->options = debug->compOps;
+  menu->addChild(compOpMenu);
 
 	MenuLabel *spacerLabel = new MenuLabel();
 	menu->addChild(spacerLabel);
