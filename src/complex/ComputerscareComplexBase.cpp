@@ -49,5 +49,38 @@ struct ComputerscareComplexBase : ComputerscareMenuParamModule {
 
 		return outputCompolyphony;
 	}
+	std::vector<int> getInputChannelIndices(int outputIndex,int wrapMode, std::vector<int> channelCounts) {
+        std::vector<int> output;
+        for(int i = 0; i < channelCounts.size(); i++) {
+        	int myInputChannelIndex=0;;
+        	int myNumChannels = channelCounts[i];
+      	    if(wrapMode == WRAP_NORMAL) {
+      	    	 /*
+	                If monophonic, copy ch1 to all
+	                Otherwise use the poly channels
+	            */
+      	    	if(myNumChannels == 1) {
+      	    		myInputChannelIndex = 0;
+      	    	} else {
+      	    		myInputChannelIndex = outputIndex;
+      	    	}
+		        } else if(wrapMode == WRAP_CYCLE) {
+		        	// Cycle through the poly channels
+		        	myInputChannelIndex = outputIndex % myNumChannels;
+		        } else if(wrapMode == WRAP_MINIMAL) {
+		          // Do not copy channel 1 if monophonic
+		        	myInputChannelIndex = outputIndex;
+		        } else if(wrapMode == WRAP_STALL) {
+		          // Go up to the maximum channel, and then use the final value for the rest
+		        	myInputChannelIndex = outputIndex>myNumChannels-1 ? myNumChannels-1 : outputIndex;
+		        }
+		        //reverse
+		        //pingpong
+		        //random shuffled
+
+		        output.push_back(myInputChannelIndex);
+        }
+        return output;
+    }
 
 };

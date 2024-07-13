@@ -133,48 +133,6 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
  
     }
 
-    std::array<int,2> getInputChannels(int index, int numFirst,int numSecond) {
-        int aInputCh = 1;
-        int bInputCh = 1;
-
-        int wrapMode = params[WRAP_MODE].getValue();
-
-        if(wrapMode == WRAP_NORMAL) {
-            /*
-                If monophonic, copy ch1 to all
-                Otherwise use the poly channels
-            */
-            if(numFirst==1) {
-                aInputCh=0;
-            } else {
-                aInputCh=index;
-            }
-            if(numSecond==1) {
-                bInputCh=0;
-            } else {
-                bInputCh=index;
-            }
-
-        } else if(wrapMode == WRAP_CYCLE) {
-            // Cycle through the poly channels
-            aInputCh = index % numFirst;
-            bInputCh = index % numSecond;
-
-        } else if(wrapMode == WRAP_MINIMAL) {
-            // Do not copy channel 1 if monophonic
-            aInputCh=index;
-            bInputCh=index;
-
-        } else if(wrapMode == WRAP_STALL) {
-            // Go up to the maximum channel, and then use the final value for the rest
-            aInputCh=index>=numFirst ? numFirst-1 : index;
-            bInputCh=index>=numSecond ? numSecond-1 : index;
-        }
-
-        return {aInputCh,bInputCh};
-
-    }
-
     void setOutputVoltages(int outIndex,int outMode,int compChannelIndex,float x, float y, float r, float theta) {
         int outputBlock = compChannelIndex > 7 ? 1 : 0;
         if(outMode==0) {
@@ -248,8 +206,10 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         float argumentOffsetKnob = params[ARGUMENT_INPUT_OFFSET].getValue();
         float argumentTrimKnob = params[ARGUMENT_INPUT_TRIM].getValue();
 
+        int wrapMode = params[WRAP_MODE].getValue();
+
         for(int rectInputCh = 0; rectInputCh < compolyChannelsRectIn; rectInputCh++) {
-            std::array<int,2> inputChannelIndices = getInputChannels(rectInputCh,numRealInputChannels,numImaginaryInputChannels);
+            std::vector<int> inputChannelIndices = getInputChannelIndices(rectInputCh,wrapMode,{numRealInputChannels,numImaginaryInputChannels});
 
             int realInputCh=inputChannelIndices[0];
             int imInputCh=inputChannelIndices[1];
@@ -265,7 +225,7 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         }
 
         for(int polarInputCh = 0; polarInputCh < compolyChannelsPolarIn; polarInputCh++) {
-            std::array<int,2> inputChannelIndices = getInputChannels(polarInputCh,numModulusInputChannels,numArgumentInputChannels);
+            std::vector<int> inputChannelIndices = getInputChannelIndices(polarInputCh,wrapMode,{numModulusInputChannels,numArgumentInputChannels});
 
             int modInputChannel=inputChannelIndices[0];
             int argInputChannel=inputChannelIndices[1];
