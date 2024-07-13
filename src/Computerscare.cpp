@@ -30,4 +30,6 @@ void init(Plugin *p) {
 
 	p->addModel(modelComputerscareNomplexPumbers);
 	p->addModel(modelComputerscareComplexGenerator);
+
+	p->addModel(modelComputerscareComplexTransformer);
 }

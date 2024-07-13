@@ -185,6 +185,14 @@
 		"tags": ["Utility",  "Polyphonic"],
 		"manualUrl":
 			"https://github.com/freddyz/computerscare-vcv-modules/blob/master/doc/complex-generator.md"
+		},
+		{
+		"slug": "computerscare-complex-transformer",
+		"name": "Complex Transformer",
+		"description": "Complex Number Transformer",
+		"tags": ["Utility",  "Polyphonic"],
+		"manualUrl":
+			"https://github.com/freddyz/computerscare-vcv-modules/blob/master/doc/complex-transformer.md"
 		}
 
 

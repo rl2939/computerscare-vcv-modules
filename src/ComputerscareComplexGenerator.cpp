@@ -54,19 +54,20 @@ struct ComputerscareComplexGenerator : ComputerscareComplexBase {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
 		for (int i = 0; i < numComplexGeneratorKnobs; i++) {
-
 			configParam(COMPLEX_XY + 2*i, -10.f, 10.f, 0.f, "Channel " + std::to_string(i + 1));
 			configParam(COMPLEX_XY + 2*i+1, -10.f, 10.f, 0.f, "Channel " + std::to_string(i + 1));
 		}
 
 		configParam(SCALE_VAL_AB    , -10.f, 10.f, 0.f, "Channel " );
 		configParam(SCALE_VAL_AB + 1, -10.f, 10.f, 0.f, "Channel ");
+		getParamQuantity(SCALE_VAL_AB)->randomizeEnabled = false;
+		getParamQuantity(SCALE_VAL_AB+1)->randomizeEnabled = false;
 
 		configParam(OFFSET_VAL_AB    , -10.f, 10.f, 0.f, "Channel " );
 		configParam(OFFSET_VAL_AB + 1, -10.f, 10.f, 0.f, "Channel ");
+		getParamQuantity(OFFSET_VAL_AB)->randomizeEnabled = false;
+		getParamQuantity(OFFSET_VAL_AB+1)->randomizeEnabled = false;
 
-		configParam(DELTA_OFFSET_AB    , -10.f, 10.f, 0.f, "Channel " );
-		configParam(DELTA_OFFSET_AB + 1, -10.f, 10.f, 0.f, "Channel ");
 
 		configParam(DELTA_OFFSET_AB    , -10.f, 10.f, 0.f, "Channel " );
 		configParam(DELTA_OFFSET_AB + 1, -10.f, 10.f, 0.f, "Channel ");
@@ -196,7 +197,7 @@ struct ComputerscareComplexGeneratorWidget : ModuleWidget {
 
 		addChild(channelWidget);
 
-		cpx::CompolyOutWidget* mainOutput = new cpx::CompolyOutWidget(Vec(60, 350),module,ComputerscareComplexGenerator::COMPOLY_MAIN_OUT_A,ComputerscareComplexGenerator::MAIN_OUTPUT_MODE,0.6);
+		cpx::CompolyPortsWidget* mainOutput = new cpx::CompolyPortsWidget(Vec(60, 350),module,ComputerscareComplexGenerator::COMPOLY_MAIN_OUT_A,ComputerscareComplexGenerator::MAIN_OUTPUT_MODE,0.6);
     addChild(mainOutput);
 
 

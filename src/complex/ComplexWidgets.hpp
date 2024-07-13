@@ -8,6 +8,13 @@ using namespace rack;
 
 namespace cpx {
 
+	enum portModes {
+      RECT_INTERLEAVED,
+      POLAR_INTERLEAVED,
+      RECT_SEPARATED,
+      POLAR_SEPARATED
+  };
+
 	inline void drawArrowTo(NVGcontext* vg,math::Vec tipPosition,float baseWidth=5.f) {
 		float angle = tipPosition.arg();
 		float len = tipPosition.norm();
@@ -229,13 +236,13 @@ namespace cpx {
 	struct CompolyModeParam : ParamQuantity {
 		std::string getDisplayValueString() override {
 			int mode = getValue();
-			if(mode == 0) {
+			if(mode == RECT_INTERLEAVED) {
 				return "Rectangular Interleaved";
-			} else if(mode == 1) {
+			} else if(mode == POLAR_INTERLEAVED) {
 				return "Polar Interleaved";
-			}else if(mode == 2) {
+			}else if(mode == RECT_SEPARATED) {
 				return "Rectangular Separated";
-			}else if(mode == 3) {
+			}else if(mode == POLAR_SEPARATED) {
 				return "Polar Separated";
 			}
 			
@@ -252,13 +259,13 @@ namespace cpx {
 		std::string getModeName() {
 			if(module) {
 				int mode = module->params[TModeParamIndex].getValue();
-					if(mode == 0) {
+				if(mode == RECT_INTERLEAVED) {
 					return blockNum==0 ? "x,y #1-8" : "x,y #9-16";
-				} else if(mode == 1) {
+				} else if(mode == POLAR_INTERLEAVED) {
 					return blockNum==0 ? "r,θ #1-8" : "r,θ #9-16";
-				}else if(mode == 2) {
+				}else if(mode == RECT_SEPARATED) {
 					return blockNum==0 ? "x" : "y";
-				}else if(mode == 3) {
+				}else if(mode == POLAR_SEPARATED) {
 					return blockNum==0 ? "r" : "θ";
 				}
 			}
@@ -350,16 +357,16 @@ struct CompolyInOrOutWidget : Widget {
 			if(lastOutMode != outMode) {
 				lastOutMode = outMode;
 						if(ports[0] && ports[1]) {
-							if(outMode==0) {
+							if(outMode==RECT_INTERLEAVED) {
 								setPorts("complex-outjack-skewL.svg","complex-outjack-skewL.svg");
 								setLabels("xy.svg");
-							} else if(outMode==1) {
+							} else if(outMode==POLAR_INTERLEAVED) {
 								setPorts("complex-outjack-slantL.svg","complex-outjack-slantL.svg");
 								setLabels("rtheta.svg");
-							} else if(outMode==2) {
+							} else if(outMode==RECT_SEPARATED) {
 								setPorts("complex-outjack-skewL.svg","complex-outjack-skewR.svg");
 								setLabels("x.svg","yy.svg");
-							} else if(outMode==3) {
+							} else if(outMode==POLAR_SEPARATED) {
 								setPorts("complex-outjack-slantR.svg","complex-outjack-slantL.svg");
 								setLabels("r.svg","theta.svg");
 							}
@@ -374,11 +381,11 @@ struct CompolyInOrOutWidget : Widget {
 	}
 };
 
-
-	struct CompolyOutWidget : CompolyInOrOutWidget<ComplexOutport> {
+	
+	struct CompolyPortsWidget : CompolyInOrOutWidget<ComplexOutport> {
 		ComplexOutport* port;
 		
-		CompolyOutWidget(math::Vec pos,ComputerscareComplexBase *cModule, int firstPortID,int compolyTypeParamID,float scale=1.0,bool isOutput=true) : CompolyInOrOutWidget(pos) {
+		CompolyPortsWidget(math::Vec pos,ComputerscareComplexBase *cModule, int firstPortID,int compolyTypeParamID,float scale=1.0,bool isOutput=true) : CompolyInOrOutWidget(pos) {
 
 			module=cModule;
 			paramID = compolyTypeParamID;

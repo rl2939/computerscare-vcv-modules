@@ -41,7 +41,7 @@ struct ComputerscareDebug : ComputerscareMenuParamModule {
 		NUM_LIGHTS
 	};
 
-	std::vector<std::string> drawModes = {"Off","Horizontal Bars", "Dots", "Lines", "Lines+Dot","Connected Shape", "Connected Shape + Dots"};
+	std::vector<std::string> drawModes = {"Off","Horizontal Bars", "Dots", "Lines", "Lines+Dot","Connected Shape", "Connected Shape + Dots","8 Arrows"};
 	std::vector<std::string> textModes= {"Off","Poly List","Complex Rect","Complex Polar"};
 	std::vector<std::string> compOps = {"NVG_SOURCE_OVER","NVG_SOURCE_IN","NVG_SOURCE_OUT","NVG_ATOP","NVG_DESTINATION_OVER","NVG_DESTINATION_IN","NVG_DESTINATION_OUT","NVG_DESTINATION_ATOP","NVG_LIGHTER","NVG_COPY","NVG_XOR"};
 
@@ -478,6 +478,8 @@ struct DebugViz : TransparentWidget {
 						draw.drawShape(pointsVec,nvgRGBA(30,120,230,50),nvgRGB(120,0,40),1.f);
 						draw.drawDots(pointsVec,colors,5.f);
 					}
+				
+			} else if(drawMode==7) {
 				
 			}
 		}
