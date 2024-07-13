@@ -64,15 +64,13 @@ struct ComputerscareComplexTransformer : ComputerscareComplexBase {
 		getParamQuantity(COMPOLY_CHANNELS)->randomizeEnabled = false;
 		getParamQuantity(COMPOLY_CHANNELS)->resetEnabled = false;
 
-		configParam(MAIN_OUTPUT_MODE,0.f,3.f,0.f);
+		configParam<cpx::CompolyModeParam>(MAIN_OUTPUT_MODE,0.f,3.f,0.f,"Main Output Mode");
 		configParam(MAIN_INPUT_MODE,0.f,3.f,0.f);
 		configParam(MAIN_SCALE_INPUT_MODE,0.f,3.f,0.f);
 		configParam(MAIN_OFFSET_INPUT_MODE,0.f,3.f,0.f);
 
-	
-
-		configOutput(COMPOLY_MAIN_OUT_A, "Main A");
-		configOutput(COMPOLY_MAIN_OUT_B, "Main B");
+		configOutput<cpx::CompolyPortInfo<MAIN_OUTPUT_MODE,0>>(COMPOLY_MAIN_OUT_A, "f(z)");
+    configOutput<cpx::CompolyPortInfo<MAIN_OUTPUT_MODE,1>>(COMPOLY_MAIN_OUT_B, "f(z)");
 
 	}
 	void process(const ProcessArgs &args) override {
