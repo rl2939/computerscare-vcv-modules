@@ -27,8 +27,10 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         POLAR_IN_POLAR_OUT_MODE,
         COMPLEX_CONSTANT_A,
         COMPLEX_CONSTANT_B,
+        AB_MODE,
         COMPLEX_CONSTANT_U,
         COMPLEX_CONSTANT_V,
+        UV_MODE,
         NUM_PARAMS
     };
     enum InputIds
@@ -95,11 +97,13 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         configParam<cpx::CompolyModeParam>(POLAR_IN_RECT_OUT_MODE,0.f,3.f,0.f,"Polar Output 1 Mode");
         configParam<cpx::CompolyModeParam>(POLAR_IN_POLAR_OUT_MODE,0.f,3.f,0.f,"Polar Output 2 Mode");
 
-        configParam(COMPLEX_CONSTANT_A,-10.f,10.f,0.f,"Complex A");
-        configParam(COMPLEX_CONSTANT_B,-10.f,10.f,0.f,"Complex B");
+        configParam(COMPLEX_CONSTANT_A,-10.f,10.f,0.f,"X Input Offset");
+        configParam(COMPLEX_CONSTANT_B,-10.f,10.f,0.f,"Y Input Offset");
+        configParam(AB_MODE,0.f,1.f,0.f,"AB Mode");
 
         configParam(COMPLEX_CONSTANT_U,-10.f,10.f,0.f,"Complex U");
         configParam(COMPLEX_CONSTANT_V,-10.f,10.f,0.f,"Complex V");
+        configParam(UV_MODE,0.f,1.f,1.f,"UV Mode");
 
         configOutput<cpx::CompolyPortInfo<RECT_IN_RECT_OUT_MODE,0>>(RECT_IN_RECT_OUT, "Rectangular Input");
         configOutput<cpx::CompolyPortInfo<RECT_IN_RECT_OUT_MODE,1>>(RECT_IN_RECT_OUT + 1, "Rectangular Input");
@@ -180,8 +184,8 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
             int realInputCh=inputChannelIndices[0];
             int imInputCh=inputChannelIndices[1];
 
-            float x = inputs[REAL_IN].getVoltage(realInputCh)*realTrimKnob + realOffsetKnob + xyParamX;
-            float y = inputs[IMAGINARY_IN].getVoltage(imInputCh)*imaginaryTrimKnob + imaginaryOffsetKnob + xyParamY;
+            float x = inputs[REAL_IN].getVoltage(realInputCh)*realTrimKnob  + xyParamX;
+            float y = inputs[IMAGINARY_IN].getVoltage(imInputCh)*imaginaryTrimKnob  + xyParamY;
 
             float r = std::hypot(x,y);
             float arg = std::atan2(y,x);
@@ -274,12 +278,12 @@ struct ComputerscareNomplexPumbersWidget : ModuleWidget
 
 
         addInput(createInput<InPort>(Vec(leftInputX, rectInSectionY), module, ComputerscareNomplexPumbers::REAL_IN));
-        addParam(createParam<SmoothKnob>(Vec(leftInputX, rectInSectionY).plus(offsetRelPos), module, ComputerscareNomplexPumbers::REAL_INPUT_OFFSET));
+        addParam(createParam<SmoothKnob>(Vec(leftInputX, rectInSectionY).plus(offsetRelPos), module, ComputerscareNomplexPumbers::COMPLEX_CONSTANT_A));
         addParam(createParam<SmallKnob>(Vec(leftInputX, rectInSectionY).plus(trimRelPos), module, ComputerscareNomplexPumbers::REAL_INPUT_TRIM));
         
         
         addInput(createInput<InPort>(Vec(rightInputX, rectInSectionY), module, ComputerscareNomplexPumbers::IMAGINARY_IN));
-        addParam(createParam<SmoothKnob>(Vec(rightInputX, rectInSectionY).plus(offsetRelPos), module, ComputerscareNomplexPumbers::IMAGINARY_INPUT_OFFSET));
+        addParam(createParam<SmoothKnob>(Vec(rightInputX, rectInSectionY).plus(offsetRelPos), module, ComputerscareNomplexPumbers::COMPLEX_CONSTANT_B));
         addParam(createParam<SmallKnob>(Vec(rightInputX, rectInSectionY).plus(trimRelPos), module, ComputerscareNomplexPumbers::IMAGINARY_INPUT_TRIM));
 
         cpx::CompolyPortsWidget* outRect1 = new cpx::CompolyPortsWidget(Vec(output1X, rectInSectionY+40),module,ComputerscareNomplexPumbers::RECT_IN_RECT_OUT,ComputerscareNomplexPumbers::RECT_IN_RECT_OUT_MODE);

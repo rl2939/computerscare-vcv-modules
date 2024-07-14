@@ -81,8 +81,9 @@ namespace cpx {
 				if(module) {
 					float complexA = module->params[paramA].getValue();
 					float complexB = module->params[paramA+1].getValue();
+					int complexMode = module->params[paramA+2].getValue();
 
-					origComplexValue = Vec(complexA,complexB);
+					origComplexValue = Vec(complexA,-complexB);
 					origComplexLength=origComplexValue.norm();
 					
 					if(origComplexLength < 0.1) {
@@ -115,10 +116,10 @@ namespace cpx {
 			newZ = pixelsDiff.div(originalMagnituteRadiusPixels).mult(origComplexLength);
 
 			module->params[paramA].setValue(newZ.x);
-			module->params[paramA+1].setValue(newZ.y);
+			module->params[paramA+1].setValue(-newZ.y);
 		} else {
 			if(module) {
-				newZ = Vec(module->params[paramA].getValue(),module->params[paramA+1].getValue());
+				newZ = Vec(module->params[paramA].getValue(),-module->params[paramA+1].getValue());
 			} else {
 				newZ = Vec(-10 + 20* random::uniform(),-10 + 20* random::uniform());
 			}

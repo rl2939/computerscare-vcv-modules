@@ -65,9 +65,13 @@ struct ComputerscareComplexTransformer : ComputerscareComplexBase {
 		getParamQuantity(COMPOLY_CHANNELS)->resetEnabled = false;
 
 		configParam<cpx::CompolyModeParam>(MAIN_OUTPUT_MODE,0.f,3.f,0.f,"Main Output Mode");
-		configParam(MAIN_INPUT_MODE,0.f,3.f,0.f);
+		configParam<cpx::CompolyModeParam>(MAIN_INPUT_MODE,0.f,3.f,0.f,"Main Input Mode");
 		configParam(MAIN_SCALE_INPUT_MODE,0.f,3.f,0.f);
 		configParam(MAIN_OFFSET_INPUT_MODE,0.f,3.f,0.f);
+
+		configInput<cpx::CompolyPortInfo<MAIN_INPUT_MODE,0>>(MAIN_INPUT, "Main");
+    configInput<cpx::CompolyPortInfo<MAIN_INPUT_MODE,1>>(MAIN_INPUT + 1, "Main");
+
 
 		configOutput<cpx::CompolyPortInfo<MAIN_OUTPUT_MODE,0>>(COMPOLY_MAIN_OUT_A, "f(z)");
     configOutput<cpx::CompolyPortInfo<MAIN_OUTPUT_MODE,1>>(COMPOLY_MAIN_OUT_B, "f(z)");

@@ -417,7 +417,7 @@ struct DebugViz : TransparentWidget {
 
 						for (int i = 0; i < 8; i++) {
 							xx[i]=module->logLines[2*i];
-							yy[i]=module->logLines[2*i+1];
+							yy[i]=-module->logLines[2*i+1];
 							colorsToDraw[i]=module->logLines[2*i]/3;
 						}
 					}
