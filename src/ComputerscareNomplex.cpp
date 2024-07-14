@@ -133,41 +133,7 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
  
     }
 
-    void setOutputVoltages(int outIndex,int outMode,int compChannelIndex,float x, float y, float r, float theta) {
-        int outputBlock = compChannelIndex > 7 ? 1 : 0;
-        if(outMode==0) {
-            //interleaved rectangular
-            outputs[outIndex+outputBlock].setVoltage(x,(compChannelIndex*2) % 16);
-            outputs[outIndex+outputBlock].setVoltage(y,(compChannelIndex*2+1) % 16);
-        } else if(outMode==1) {
-            //interleaved polar
-            outputs[outIndex+outputBlock].setVoltage(r,(compChannelIndex*2) % 16);
-            outputs[outIndex+outputBlock].setVoltage(theta,(compChannelIndex*2+1) % 16);
-        } else if(outMode==2) {
-            //separated rectangular
-            outputs[outIndex].setVoltage(x,compChannelIndex);
-            outputs[outIndex+1].setVoltage(y,compChannelIndex);
-        } else if(outMode==3) {
-            //separated polar
-            outputs[outIndex].setVoltage(r,compChannelIndex);
-            outputs[outIndex+1].setVoltage(theta,compChannelIndex);
-        }
-    }
-
-    void setOutputChannels(int outIndex,int outMode,int compolyChannels) {
-        if(outMode==0 || outMode ==1) {
-            //interleaved
-            int numTotalPolyChannels = compolyChannels*2;
-            int numChannels1 = numTotalPolyChannels >= 16 ? 16 : numTotalPolyChannels;
-            int numChannels2 = numTotalPolyChannels >= 16 ? numTotalPolyChannels-16 : 0;
-
-            outputs[outIndex+0].setChannels(numChannels1);
-            outputs[outIndex+1].setChannels(numChannels2);
-        } else {
-            outputs[outIndex+0].setChannels(compolyChannels);
-            outputs[outIndex+1].setChannels(compolyChannels);
-        }
-    }
+   
 
     void process(const ProcessArgs &args) override {
         ComputerscarePolyModule::checkCounter();
