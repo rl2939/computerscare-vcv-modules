@@ -179,7 +179,7 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         int wrapMode = params[WRAP_MODE].getValue();
 
         for(int rectInputCh = 0; rectInputCh < compolyChannelsRectIn; rectInputCh++) {
-            std::vector<int> inputChannelIndices = getInputChannelIndices(rectInputCh,wrapMode,{numRealInputChannels,numImaginaryInputChannels});
+            std::vector<int> inputChannelIndices = getChannelIndicesFromSeparatedInput(rectInputCh,wrapMode,{numRealInputChannels,numImaginaryInputChannels});
 
             int realInputCh=inputChannelIndices[0];
             int imInputCh=inputChannelIndices[1];
@@ -195,7 +195,7 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         }
 
         for(int polarInputCh = 0; polarInputCh < compolyChannelsPolarIn; polarInputCh++) {
-            std::vector<int> inputChannelIndices = getInputChannelIndices(polarInputCh,wrapMode,{numModulusInputChannels,numArgumentInputChannels});
+            std::vector<int> inputChannelIndices = getChannelIndicesFromSeparatedInput(polarInputCh,wrapMode,{numModulusInputChannels,numArgumentInputChannels});
 
             int modInputChannel=inputChannelIndices[0];
             int argInputChannel=inputChannelIndices[1];

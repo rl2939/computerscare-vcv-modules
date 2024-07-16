@@ -10,6 +10,8 @@ struct ComputerscareComplexTransformer;
 
 struct ComputerscareComplexTransformer : ComputerscareComplexBase {
 	ComputerscareSVGPanel* panelRef;
+	int compolyChannelsMainOutput = 0;
+
 	enum ParamIds {
 
 		COMPOLY_CHANNELS,
@@ -79,6 +81,17 @@ struct ComputerscareComplexTransformer : ComputerscareComplexBase {
 	}
 	void process(const ProcessArgs &args) override {
 		ComputerscarePolyModule::checkCounter();
+
+		int compolyphonyKnobSetting = params[COMPOLY_CHANNELS].getValue();
+		int mainInputMode = params[MAIN_INPUT_MODE].getValue();
+
+		std::vector<int> inputCompolyphony = getInputCompolyphony({MAIN_INPUT_MODE},{MAIN_INPUT});
+
+
+		compolyChannelsMainOutput = calcOutputCompolyphony(compolyphonyKnobSetting,inputCompolyphony);
+		int mainOutputMode = params[MAIN_OUTPUT_MODE].getValue();
+		setOutputChannels(COMPOLY_MAIN_OUT_A,mainOutputMode,compolyChannelsMainOutput);
+
 		
 		float offsetX = params[OFFSET_VAL_AB].getValue();
 		float offsetY = params[OFFSET_VAL_AB+1].getValue();
@@ -91,17 +104,16 @@ struct ComputerscareComplexTransformer : ComputerscareComplexBase {
 
 
 
-		for (int i = 0; i < polyChannels; i++) {
-			if(i < 8) {
+		for (int complexOutputChannel = 0; complexOutputChannel < compolyChannelsMainOutput; complexOutputChannel++) {
+			std::vector<float> mainInputVoltages = getComplexVoltageFromInterleavedInput(complexOutputChannel, MAIN_INPUT, 0, inputCompolyphony[0]);
 
-	
+			float x = mainInputVoltages[0];
+			float y = mainInputVoltages[1];
 
-				outputs[COMPOLY_MAIN_OUT_A].setVoltage( offsetX, 2*i);
-				outputs[COMPOLY_MAIN_OUT_A].setVoltage( offsetY, 2*i+1);
-			} 
-			
-			//outputs[POLY_OUTPUT].setVoltage(params[KNOB + i].getValue()*trim + offset, i);
+			setOutputVoltages(COMPOLY_MAIN_OUT_A,mainOutputMode,complexOutputChannel,x,y,1,.4848);
 		}
+
+
 	}
 	void checkPoly() override {
 		polyChannels = params[COMPOLY_CHANNELS].getValue();
@@ -176,7 +188,7 @@ struct ComputerscareComplexTransformerWidget : ModuleWidget {
 			panel->setBackground(APP->window->loadSvg(asset::plugin(pluginInstance, "res/ComputerscareComplexTransformerPanel.svg")));
 			addChild(panel);
 		}
-		channelWidget = new PolyOutputChannelsWidget(Vec(92, 4), module, ComputerscareComplexTransformer::COMPOLY_CHANNELS);
+		channelWidget = new PolyOutputChannelsWidget(Vec(92, 4), module, ComputerscareComplexTransformer::COMPOLY_CHANNELS,&module->compolyChannelsMainOutput);
 	
 
 		//addOutput(createOutput<PointingUpPentagonPort>(Vec(30, 22), module, ComputerscareComplexTransformer::POLY_OUTPUT));
