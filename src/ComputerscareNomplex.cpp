@@ -126,14 +126,14 @@ struct ComputerscareNomplexPumbers : ComputerscareComplexBase
         int numRealInputChannels = inputs[REAL_IN].getChannels();
         int numImaginaryInputChannels = inputs[IMAGINARY_IN].getChannels();
 
-        compolyChannelsRectIn = calcOutputCompolyphony(rectInputCompolyphonyKnobSetting,{numRealInputChannels,numImaginaryInputChannels});
+        compolyChannelsRectIn = calcOutputCompolyphony(rectInputCompolyphonyKnobSetting,{{numRealInputChannels,numImaginaryInputChannels}});
  
         int polarInputCompolyphonyKnobSetting = params[COMPOLY_CHANNELS_POLAR_IN].getValue();
 
         int numModulusInputChannels = inputs[MODULUS_IN].getChannels();
         int numArgumentInputChannels = inputs[ARGUMENT_IN].getChannels();
 
-        compolyChannelsPolarIn = calcOutputCompolyphony(polarInputCompolyphonyKnobSetting,{numModulusInputChannels,numArgumentInputChannels});
+        compolyChannelsPolarIn = calcOutputCompolyphony(polarInputCompolyphonyKnobSetting,{{numModulusInputChannels,numArgumentInputChannels}});
  
     }
 

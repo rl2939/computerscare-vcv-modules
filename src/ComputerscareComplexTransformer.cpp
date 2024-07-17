@@ -81,11 +81,12 @@ struct ComputerscareComplexTransformer : ComputerscareComplexBase {
 	}
 	void process(const ProcessArgs &args) override {
 		ComputerscarePolyModule::checkCounter();
+		int wrapMode = 0;
 
 		int compolyphonyKnobSetting = params[COMPOLY_CHANNELS].getValue();
 		int mainInputMode = params[MAIN_INPUT_MODE].getValue();
 
-		std::vector<int> inputCompolyphony = getInputCompolyphony({MAIN_INPUT_MODE},{MAIN_INPUT});
+		std::vector<std::vector <int>> inputCompolyphony = getInputCompolyphony({MAIN_INPUT_MODE},{MAIN_INPUT});
 
 
 		compolyChannelsMainOutput = calcOutputCompolyphony(compolyphonyKnobSetting,inputCompolyphony);
@@ -105,12 +106,18 @@ struct ComputerscareComplexTransformer : ComputerscareComplexBase {
 
 
 		for (int complexOutputChannel = 0; complexOutputChannel < compolyChannelsMainOutput; complexOutputChannel++) {
-			std::vector<float> mainInputVoltages = getComplexVoltageFromInterleavedInput(complexOutputChannel, MAIN_INPUT, 0, inputCompolyphony[0]);
+		//	DEBUG("%i",complexOutputChannel);
+	
 
-			float x = mainInputVoltages[0];
-			float y = mainInputVoltages[1];
+			std::vector<float> complexQuadRep = getComplexVoltage(complexOutputChannel, MAIN_INPUT,mainInputMode, wrapMode, inputCompolyphony);
 
-			setOutputVoltages(COMPOLY_MAIN_OUT_A,mainOutputMode,complexOutputChannel,x,y,1,.4848);
+			float x = complexQuadRep[0];
+			float y = complexQuadRep[1];
+			float r = complexQuadRep[2];
+			float theta = complexQuadRep[3];
+
+			setOutputVoltages(COMPOLY_MAIN_OUT_A,mainOutputMode,complexOutputChannel,x,y,r,theta);
+			//setOutputVoltages(COMPOLY_MAIN_OUT_A,mainOutputMode,complexOutputChannel,1,1,1,1);
 		}
 
 
