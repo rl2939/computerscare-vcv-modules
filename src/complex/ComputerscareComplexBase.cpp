@@ -147,7 +147,7 @@ struct ComputerscareComplexBase : ComputerscareMenuParamModule {
 				-port0, ch3
 	*/
 
-	std::vector<float> getComplexVoltageFromSeparatedInput(int outputIndex, int firstPortID, int inputMode,int wrapMode,std::vector <int>  inputCompolyphony) {
+	std::vector<float> getComplexVoltageFromSeparatedInput(int outputIndex, int firstPortID, int inputMode,int wrapMode,std::vector <int>&  inputCompolyphony) {
 		std::vector<float> output = {};
 
 			int firstPortIndex = outputIndex;
@@ -173,7 +173,7 @@ struct ComputerscareComplexBase : ComputerscareMenuParamModule {
 
 	   return output;
 	}
-	std::vector<float> getComplexVoltageFromInterleavedInput(int outputIndex, int firstPortID, int inputMode,int wrapMode,std::vector<int> inputCompolyphony) {
+	std::vector<float> getComplexVoltageFromInterleavedInput(int outputIndex, int firstPortID, int inputMode,int wrapMode,std::vector<int>& inputCompolyphony) {
 		std::vector<float> output = {};
 		int portIndex = outputIndex >= 8 ? firstPortID + 1 : firstPortID;
 		int relativeOutputChannelIndex = outputIndex % 8;
@@ -216,7 +216,8 @@ struct ComputerscareComplexBase : ComputerscareMenuParamModule {
 
 
 
-	std::vector<float>  getComplexVoltage(int outputIndex, int firstPortID, int inputMode,int wrapMode,std::vector<std::vector <int>> inputCompolyphony) {
+	std::vector<float>  getComplexVoltage(int outputIndex, int firstPortID, int inputMode,int wrapMode,std::vector<std::vector <int>>& inputCompolyphony) {
+		//return {0.f,1.f,2.f,3.f};
 		std::vector<float> mainInputVoltages;
 		if(inputMode==RECT_INTERLEAVED || inputMode == POLAR_INTERLEAVED) { 
 			mainInputVoltages = getComplexVoltageFromInterleavedInput(outputIndex, firstPortID,inputMode, wrapMode, inputCompolyphony[0]);
