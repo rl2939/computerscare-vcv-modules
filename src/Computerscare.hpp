@@ -275,16 +275,7 @@ struct ComputerscareBlueLight : ModuleLightWidget {
 	}
 };
 
-
-
-
 */
-template <typename BASE>
-struct MuteLight : BASE {
-	MuteLight() {
-		this->box.size = mm2px(Vec(6.f, 6.f));
-	}
-};
 
 template <typename BASE>
 struct ComputerscareHugeLight : BASE  {
